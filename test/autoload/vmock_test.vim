@@ -1,13 +1,13 @@
 let s:t = vimtest#new('mock of global function(g:)')
 
 function! s:t.setup()
-  function! g:vimmock_global_func()
+  function! g:vmock_global_func()
     return 10
   endfunction
 endfunction
 
 function! s:t.teardown()
-  delfunction g:vimmock_global_func
+  delfunction g:vmock_global_func
 endfunction
 
 function! s:t.not_return()
@@ -15,10 +15,10 @@ function! s:t.not_return()
 endfunction
 
 function! s:t.no_args()
-  call self.assert.equals(10, g:vimmock_global_func())
-  let mock = vimock#mock()
-  call mock.function('g:vimmock_global_func').return(100)
-  call self.assert.equals(100, g:vimmock_global_func())
+  call self.assert.equals(10, g:vmock_global_func())
+  let mock = vmock#mock()
+  call mock.function('g:vmock_global_func').return(100)
+  call self.assert.equals(100, g:vmock_global_func())
 endfunction
 
 function! s:t.with_args_default()
