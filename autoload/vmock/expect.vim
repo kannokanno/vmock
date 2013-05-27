@@ -3,7 +3,7 @@
 let s:save_cpo = &cpo
 set cpo&vim
 
-function! vmock#expectation#new(funcname)
+function! vmock#expect#new(funcname)
   " globalコンテキストへのひもづけはfuncname
   " return_statement
   "   リライトする際のreturn文。デフォルトは空文字
@@ -33,37 +33,37 @@ function! vmock#expectation#new(funcname)
   "     vmock#global#counter(funcname).called()
   "     vmock#global#matcher(funcname).match(args)
 
-  let expectation = {}
+  let expect = {}
 
-  function! expectation.return(value)
+  function! expect.return(value)
     return self
   endfunction
 
-  function! expectation.with(...)
+  function! expect.with(...)
     let self.__matcher = vmock#matcher#with#new(a:args)
     return self
   endfunction
 
-  function! expectation.once()
+  function! expect.once()
     let self.__matcher = vmock#matcher#counter#new()
     return self
   endfunction
 
-  function! expectation.verify()
+  function! expect.verify()
     " TODO 結果の扱い
     " call s:args_matcher.result()
     " call s:count_validater.validate()
   endfunction
 
-  function! expectation.get_matcher()
+  function! expect.get_matcher()
     return self.__matcher
   endfunction
 
-  function! expectation.get_counter()
+  function! expect.get_counter()
     return self.__counter
   endfunction
 
-  return expectation
+  return expect
 endfunction
 
 let &cpo = s:save_cpo

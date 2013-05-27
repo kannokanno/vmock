@@ -3,7 +3,7 @@
 let s:save_cpo = &cpo
 set cpo&vim
 
-let s:expectations = {}
+let s:expects = {}
 
 function! vmock#mock#new()
   let mock = {}
@@ -14,15 +14,15 @@ function! vmock#mock#new()
     " call add(self.__original_defines, original_define)
     " " 関数定義を上書き
     " call s:override_mock_define(self.__original_define)
-    let expectation = vmock#expectation#new(a:funcname)
-    " call s:expectations[funcname] = expectation
-    return expectation
+    let expect = vmock#expect#new(a:funcname)
+    " call s:expects[funcname] = expect
+    return expect
   endfunction
 
   function! mock.verify()
     " TODO 結果保持の仕様
-    " for expectation in self.__expectations
-    "   call expectation.verify()
+    " for expect in self.__expects
+    "   call expect.verify()
     " endfor
   endfunction
 
@@ -36,9 +36,9 @@ function! vmock#mock#new()
 endfunction
 
 function! vmock#mock#called(funcname, args)
-  "let expectation = s:expectations[a:funcname]
-  "call expectation.get_counter().called()
-  "call expectation.get_matcher().match(a:args)
+  "let expect = s:expects[a:funcname]
+  "call expect.get_counter().called()
+  "call expect.get_matcher().match(a:args)
 endfunction
 
 function! s:override_mock_define(define)
