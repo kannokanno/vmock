@@ -1,5 +1,9 @@
 let s:t = vimtest#new('mock of global function(g:)')
 
+function! s:doit()
+  return g:vmock_global_func()
+endfunction
+
 function! s:t.setup()
   function! g:vmock_global_func()
     return 10
@@ -18,7 +22,7 @@ function! s:t.no_args()
   call self.assert.equals(10, g:vmock_global_func())
   let mock = vmock#mock()
   call mock.function('g:vmock_global_func').return(100)
-  call self.assert.equals(100, g:vmock_global_func())
+  call self.assert.equals(100, s:doit())
 endfunction
 
 function! s:t.with_args_default()
@@ -76,3 +80,10 @@ function! s:t.callback()
   " 仕様決めから
   call self.assert.fail("未実装")
 endfunction
+
+
+" TODO
+" g:なしの指定
+" 大文字関数
+" autoload関数
+" 辞書関数
