@@ -1,5 +1,13 @@
 let s:t = vimtest#new()
 
+function! s:t.setup()
+  call vmock#container#clear()
+endfunction
+
+function! s:t.teardown()
+  call vmock#container#clear()
+endfunction
+
 function! s:t.test()
   call self.assert.equals([], vmock#container#get_mocks())
 

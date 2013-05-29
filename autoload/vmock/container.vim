@@ -18,7 +18,9 @@ endfunction
 
 function! vmock#container#clear()
   for mock in s:mock_container
-    call mock.teardown()
+    if has_key(mock, 'teardown')
+      call mock.teardown()
+    endif
   endfor
   let s:mock_contaier = []
 endfunction
