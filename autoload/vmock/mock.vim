@@ -6,16 +6,15 @@ set cpo&vim
 let s:expects = {}
 
 function! vmock#mock#new()
-  let mock = {}
+  let mock = {'__original_defines': []}
 
   function! mock.function(funcname)
-    " " オリジナルを記憶
-    " let original_define = s:get_original_define(funcname)
-    " call add(self.__original_defines, original_define)
-    " " 関数定義を上書き
-    " call s:override_mock_define(self.__original_define)
+    " TODO test
+    let original_define = vmock#function_define#get(a:funcname)
+    call add(self.__original_defines, original_define)
+    call vmock#function_define#override_mock(original_define)
     let expect = vmock#expect#new(a:funcname)
-    " call s:expects[funcname] = expect
+    let s:expects[a:funcname] = expect
     return expect
   endfunction
 
@@ -27,9 +26,10 @@ function! vmock#mock#new()
   endfunction
 
   function! mock.teardown()
-    " for define in self.__original_defines
-    "   call s:remembar_define(define)
-    " endfor
+    " TODO test
+    for define in self.__original_defines
+      call s:remembar_define(define)
+    endfor
   endfunction
 
   return mock
@@ -41,9 +41,14 @@ function! vmock#mock#called(funcname, args)
   "call expect.get_matcher().match(a:args)
 endfunction
 
-function! s:override_mock_define(define)
-  let body = printf("call vmock#mock#called('%s', [%s])\n%s", a:define.funcname, join(a:define.args, ','), a:define.body)
-  execute printf("function! %s(%s)\n%s\nendfunction", a:define.funcname, a:define.args, body)
+function! vmock#mock#return(funcname)
+  " TODO test
+  let expect = s:expects[a:funcname]
+  return expect.get_return_value()
+endfunction
+
+function! s:remembar_define(original_define)
+  call vmock#function_define#override(a:original_define.funcname, a:original_define.arg_names, a:original_define.body)
 endfunction
 
 let &cpo = s:save_cpo

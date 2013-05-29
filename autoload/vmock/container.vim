@@ -3,21 +3,25 @@
 let s:save_cpo = &cpo
 set cpo&vim
 
+let s:mock_container = []
+
+" TODO test
+
 function! vmock#container#add_mock(mock)
-  " s:mock_container.add(mock)
+  " TODO 型チェック
+  call add(s:mock_container, a:mock)
 endfunction
 
 function! vmock#container#get_mocks()
-  " return deepcopy(s:mock_contaier)
+  return deepcopy(s:mock_container)
 endfunction
 
 function! vmock#container#clear()
-  " for mock in s:mock_container
-  "   call mock.teardown()
-  " endfor
-  " s:mock_contaier = []
+  for mock in s:mock_container
+    call mock.teardown()
+  endfor
+  let s:mock_contaier = []
 endfunction
 
 let &cpo = s:save_cpo
 unlet s:save_cpo
-

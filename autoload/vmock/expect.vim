@@ -33,9 +33,13 @@ function! vmock#expect#new(funcname)
   "     vmock#global#counter(funcname).called()
   "     vmock#global#matcher(funcname).match(args)
 
-  let expect = {}
+  " TODO 初期はオリジナル定義。のtest
+  let expect = {
+        \ '__return_value': '',
+        \ }
 
   function! expect.return(value)
+    let self.__return_value = a:value
     return self
   endfunction
 
@@ -53,6 +57,10 @@ function! vmock#expect#new(funcname)
     " TODO 結果の扱い
     " call s:args_matcher.result()
     " call s:count_validater.validate()
+  endfunction
+
+  function! expect.get_return_value()
+    return self.__return_value
   endfunction
 
   function! expect.get_matcher()
