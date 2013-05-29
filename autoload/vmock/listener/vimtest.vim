@@ -4,6 +4,7 @@ let s:save_cpo = &cpo
 set cpo&vim
 
 function! vmock#listener#vimtest#teardown()
+  " TODO vimtest側の対応
   " vimtest側の仕様によって挙動は変わる
     " アサーションカウント
     " エラーなのかfalseなのか
