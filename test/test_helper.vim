@@ -20,22 +20,28 @@ endfunction
 function! g:vmock_data_provider()
   let provider = {}
 
+  " 引数なし 戻り値あり
   function! provider.g_colon_no_args()
-    let data = s:template()
-    let data.funcname = 'g:vmock_g_colon_no_args'
-    let data.original_result = 10
-    let data.mock_result = 100
     function! g:vmock_g_colon_no_args()
       return 10
     endfunction
-    return data
+    return s:template('g:vmock_g_colon_no_args', [])
+  endfunction
+
+  " 引数なし 戻り値なし
+  function! provider.g_colon_no_args_no_return()
+    function! g:vmock_g_colon_no_args_no_return()
+    endfunction
+    return s:template('g:vmock_g_colon_no_args_no_return', [])
   endfunction
 
   return provider
 endfunction
 
-function! s:template()
+function! s:template(funcname, args_names)
   let template = {}
+  let template.funcname = a:funcname
+  let template.original_result = call(a:funcname, a:args_names)
   function! template.funccall()
     " TODO args
     return call(self.funcname, [])

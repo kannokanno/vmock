@@ -35,7 +35,7 @@ function! vmock#expect#new(funcname)
 
   " TODO 初期はオリジナル定義。のtest
   let expect = {
-        \ '__return_value': '',
+        \ '__return_value': 0,
         \ }
 
   function! expect.return(value)
