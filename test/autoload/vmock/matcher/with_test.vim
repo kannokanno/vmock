@@ -1,4 +1,4 @@
-let s:t = vimtest#new('with.any()')
+let s:t = vimtest#new('vmock#with#any()')
 
 function! s:t.no_arg()
   let matcher = vmock#matcher#with#any()
@@ -14,7 +14,7 @@ function! s:t.wtih_arg()
 endfunction
 
 
-let s:t = vimtest#new('with.eq()')
+let s:t = vimtest#new('vmock#with#eq()')
 
 function! s:t.match()
   for Arg in s:arg_data_provider()
@@ -32,7 +32,7 @@ function! s:t.match_ignorecase()
 endfunction
 
 
-let s:t = vimtest#new('with.not_eq()')
+let s:t = vimtest#new('vmock#with#not_eq()')
 
 function! s:t.match()
   for Arg in s:arg_data_provider()
@@ -50,7 +50,7 @@ function! s:t.match_ignorecase()
 endfunction
 
 
-let s:t = vimtest#new('with.loose_eq()')
+let s:t = vimtest#new('vmock#with#loose_eq()')
 
 function! s:t.match()
   for Arg in s:arg_data_provider()
@@ -68,7 +68,7 @@ function! s:t.match_ignorecase()
 endfunction
 
 
-let s:t = vimtest#new('with.loose_not_eq()')
+let s:t = vimtest#new('vmock#with#loose_not_eq()')
 
 function! s:t.match()
   for Arg in s:arg_data_provider()
@@ -86,7 +86,7 @@ function! s:t.match_ignorecase()
 endfunction
 
 
-let s:t = vimtest#new('with.type()')
+let s:t = vimtest#new('vmock#with#type()')
 
 function! s:t.match()
   call self.assert.true(vmock#matcher#with#type(1).match(0))
@@ -124,7 +124,7 @@ function! s:t.not_match()
 endfunction
 
 
-let s:t = vimtest#new('with.has()')
+let s:t = vimtest#new('vmock#with#has()')
 
 function! s:t.match_invalid_type()
   let matcher = vmock#matcher#with#has('key')
@@ -152,7 +152,7 @@ function! s:t.match_dict()
 endfunction
 
 
-let s:t = vimtest#new('with.custom()')
+let s:t = vimtest#new('vmock#with#custom()')
 
 function! s:t.global_func()
   function! g:vmock_with_test_custom_func(args)
