@@ -51,6 +51,9 @@ function! vmock#function_define#override_mock(define)
 endfunction
 function
 function! vmock#function_define#override(funcname, arg_names, body)
+  if empty(a:funcname)
+    throw 'Function name required'
+  endif
   execute printf("function! %s(%s)\n%s\nendfunction", a:funcname, join(a:arg_names, ','), a:body)
 endfunction
 

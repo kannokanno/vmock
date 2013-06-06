@@ -98,7 +98,9 @@ endfunction
 let s:t = vimtest#new('vmock#function_define#override() - g:func') "{{{
 
 function! s:t.teardown()
-  delfunction g:vmock_global_func
+  if exists('g:vmock_global_func')
+    delfunction g:vmock_global_func
+  endif
 endfunction
 
 function! s:t.no_args()
@@ -163,6 +165,25 @@ function! s:t.variable_args()
         \ '1  return map(copy(a:000), "v:val + 1")',
         \ '   endfunction',
         \ ], "\n"), s:get_define_string('g:vmock_global_func'))
+endfunction
+
+function! s:t.no_return()
+  function! g:vmock_global_func()
+    throw 'unexpected called'
+  endfunction
+  call vmock#function_define#override('g:vmock_global_func', [], '')
+  call g:vmock_global_func()
+  call self.assert.equals(join([
+        \ '',
+        \ '   function g:vmock_global_func()',
+        \ '1   ',
+        \ '   endfunction',
+        \ ], "\n"), s:get_define_string('g:vmock_global_func'))
+endfunction
+
+function! s:t.exception_when_funcname_is_empty()
+  call self.assert.throw('Function name required')
+  call vmock#function_define#override('', [], '')
 endfunction
 "}}}
 let s:t = vimtest#new('vmock#function_define#override() - GlobalFunc') "{{{
