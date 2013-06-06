@@ -182,7 +182,7 @@ function! s:t.no_return()
 endfunction
 
 function! s:t.exception_when_funcname_is_empty()
-  call self.assert.throw('Function name required')
+  call self.assert.throw('VMockException:Function name required')
   call vmock#function_define#override('', [], '')
 endfunction
 "}}}
