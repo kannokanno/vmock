@@ -248,6 +248,16 @@ function! s:t.override()
   " TODO 関数名が番号(530とか)になっちゃうので定義一致のテストめんどい。
 endfunction
 "}}}
+let s:t = vimtest#new('vmock#function_define#override_mock()') "{{{
+
+function! s:t.call_test()
+  function! g:vmock_global_func()
+    return 10
+  endfunction
+  " エラーなく処理が終了することだけ確認
+  call vmock#function_define#override_mock({'funcname': 'g:vmock_test_func', 'arg_names': ['first']})
+endfunction
+"}}}
 let s:t = vimtest#new('vmock#function_define#build_mock_body()') "{{{
 
 function! s:t.build_mock_body()
