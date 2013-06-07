@@ -4,36 +4,6 @@ let s:save_cpo = &cpo
 set cpo&vim
 
 function! vmock#expect#new(funcname)
-  " globalコンテキストへのひもづけはfuncname
-  " return_statement
-  "   リライトする際のreturn文。デフォルトは空文字
-  " return()
-  "   リライトする際のreturn文を指定
-  " with()
-  "   関数の引数を検証する値を指定
-  "   引数からMatcherを作成する
-  "   globalコンテキストにひもづけを行い記録する
-  " times() (once/naver/any)
-  "   期待する関数の呼び出し回数を指定
-  "   引数からMatcherを作成する
-  "   globalコンテキストにひもづけを行い記録する
-  " verfiy()
-  "   args_matcherとcount_matcherを取り出す
-  "   args_matcher.is_ok() && count_matcher.match()
-  "       args_matchはここで実行じゃないので、「結果どうだったか」を見るぐらい？
-  " teardown()
-  "   関数定義を元に戻す。外から呼ばれるかな
-
-  " 作成時に関数定義を更新
-  "   関数名をプロパティに保存
-  "   オリジナルの定義(処理、引数)をプロパティに保存
-  "     NOTE: 存在しない関数名の場合を検討(そのままモック化できた方が便利な気もする)
-  "   calledとargsのmatchを仕込み、戻り値を改ざんした定義で更新する
-  "     NOTE: autoload関数経由なら、スクリプトローカルでもいけるんじゃね？
-  "     vmock#global#counter(funcname).called()
-  "     vmock#global#matcher(funcname).match(args)
-
-  " TODO 初期はオリジナル定義。のtest
   let expect = {
         \ '__return_value': 0,
         \ }
@@ -49,8 +19,27 @@ function! vmock#expect#new(funcname)
   endfunction
 
   function! expect.once()
-    let self.__matcher = vmock#matcher#counter#new()
-    return self
+    return self.__set_counter(vmock#matcher#count#once())
+  endfunction
+
+  function! expect.times(count)
+    return self.__set_counter(vmock#matcher#count#times(a:count))
+  endfunction
+
+  function! expect.at_least(count)
+    return self.__set_counter(vmock#matcher#count#at_least(a:count))
+  endfunction
+
+  function! expect.at_most(count)
+    return self.__set_counter(vmock#matcher#count#at_most(a:count))
+  endfunction
+
+  function! expect.any()
+    return self.__set_counter(vmock#matcher#count#any())
+  endfunction
+
+  function! expect.never()
+    return self.__set_counter(vmock#matcher#count#never())
   endfunction
 
   function! expect.verify()
@@ -69,6 +58,11 @@ function! vmock#expect#new(funcname)
 
   function! expect.get_counter()
     return self.__counter
+  endfunction
+
+  function! expect.__set_counter(counter)
+    let self.__counter = a:counter
+    return self
   endfunction
 
   return expect

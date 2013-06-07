@@ -4,7 +4,7 @@ let s:save_cpo = &cpo
 set cpo&vim
 
 function! vmock#matcher#count#once()
-  let m = s:prototype()
+  let m = s:prototype('once')
   function! m.match()
     return self.__called_count ==# 1
   endfunction
@@ -12,7 +12,7 @@ function! vmock#matcher#count#once()
 endfunction
 
 function! vmock#matcher#count#times(expected)
-  let m = s:prototype()
+  let m = s:prototype('times')
   let m.__expected_count = a:expected
   function! m.match()
     return self.__called_count ==# self.__expected_count
@@ -21,7 +21,7 @@ function! vmock#matcher#count#times(expected)
 endfunction
 
 function! vmock#matcher#count#at_least(expected)
-  let m = s:prototype()
+  let m = s:prototype('at_least')
   let m.__expected_count = a:expected
   function! m.match()
     return self.__expected_count <= self.__called_count
@@ -30,7 +30,7 @@ function! vmock#matcher#count#at_least(expected)
 endfunction
 
 function! vmock#matcher#count#at_most(expected)
-  let m = s:prototype()
+  let m = s:prototype('at_most')
   let m.__expected_count = a:expected
   function! m.match()
     return self.__called_count <= self.__expected_count
@@ -39,7 +39,7 @@ function! vmock#matcher#count#at_most(expected)
 endfunction
 
 function! vmock#matcher#count#any()
-  let m = s:prototype()
+  let m = s:prototype('any')
   function! m.match()
     return 1 == 1
   endfunction
@@ -47,15 +47,16 @@ function! vmock#matcher#count#any()
 endfunction
 
 function! vmock#matcher#count#never()
-  let m = s:prototype()
+  let m = s:prototype('never')
   function! m.match()
     return self.__called_count < 1
   endfunction
   return m
 endfunction
 
-function! s:prototype()
-  let counter = {'__called_count': 0}
+function! s:prototype(name)
+  " NOTE:オブジェクトの識別子としてnameプロパティを持つがダサい
+  let counter = {'__name': a:name, '__called_count': 0}
 
   function! counter.called()
     let self.__called_count += 1
