@@ -6,6 +6,7 @@ set cpo&vim
 function! vmock#expect#new(funcname)
   let expect = {
         \ '__return_value': 0,
+        \ '__counter': vmock#matcher#count#any(),
         \ }
 
   function! expect.return(value)

@@ -9,7 +9,12 @@ function! s:t.setting_return_value()
 endfunction
 "}}}
 
-let s:t = vimtest#new('vmock#expect counter')
+let s:t = vimtest#new('vmock#expect counter') "{{{
+
+function! s:t.default_is_any()
+  let expect = vmock#expect#new('g:vmock_hoge')
+  call self.assert.equals('any', expect.get_counter().__name)
+endfunction
 
 function! s:t.once()
   let expect = vmock#expect#new('g:vmock_hoge').once()
@@ -47,4 +52,4 @@ function! s:t.resetting()
   call expect.any()
   call self.assert.equals('any', expect.get_counter().__name)
 endfunction
-
+"}}}
