@@ -18,7 +18,7 @@ function! vmock#matcher#composite_with#make_instance(matchers)
     call vmock#exception#throw('arg type must be List')
   endif
 
-  let obj = s:prototype(map(a:matchers, 's:convert_matcher(v:val)'))
+  let obj = s:prototype(map(deepcopy(a:matchers), 's:convert_matcher(v:val)'))
   function! obj.match(...)
     if a:0 !=# self.__matchers_len
       let msg = printf('expected %d args, but %d args were passed.', self.__matchers_len, a:0)

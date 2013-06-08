@@ -8,7 +8,6 @@ function! s:t.setting_return_value()
   endfor
 endfunction
 "}}}
-
 let s:t = vimtest#new('vmock#expect counter') "{{{
 
 function! s:t.default_is_any()
@@ -51,5 +50,26 @@ function! s:t.resetting()
   call self.assert.equals('never', expect.get_counter().__name)
   call expect.any()
   call self.assert.equals('any', expect.get_counter().__name)
+endfunction
+"}}}
+let s:t = vimtest#new('vmock#expect with()') "{{{
+
+function! s:t.default_is_empty_matcher()
+  let expect = vmock#expect#new('g:vmock_hoge')
+  call self.assert.equals(0, expect.get_matcher().__matchers_len)
+endfunction
+
+function! s:t.exception_when_empty_args()
+  call self.assert.throw('VMockException:Required args')
+  let expect = vmock#expect#new('g:vmock_hoge').with()
+endfunction
+
+function! s:t.setting_matchers()
+  let expect = vmock#expect#new('g:vmock_hoge').with(1)
+  call self.assert.equals(1, expect.get_matcher().__matchers_len)
+  let expect = vmock#expect#new('g:vmock_hoge').with(1, 'a')
+  call self.assert.equals(2, expect.get_matcher().__matchers_len)
+  let expect = vmock#expect#new('g:vmock_hoge').with(1, 'a', {'key': 'val'})
+  call self.assert.equals(3, expect.get_matcher().__matchers_len)
 endfunction
 "}}}

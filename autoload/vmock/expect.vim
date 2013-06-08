@@ -6,6 +6,7 @@ set cpo&vim
 function! vmock#expect#new(funcname)
   let expect = {
         \ '__return_value': 0,
+        \ '__matcher': vmock#matcher#composite_with#empty_instance(),
         \ '__counter': vmock#matcher#count#any(),
         \ }
 
@@ -15,7 +16,10 @@ function! vmock#expect#new(funcname)
   endfunction
 
   function! expect.with(...)
-    let self.__matcher = vmock#matcher#with#new(a:args)
+    if a:0 ==# 0
+      call vmock#exception#throw('Required args')
+    endif
+    let self.__matcher = vmock#matcher#composite_with#make_instance(a:000)
     return self
   endfunction
 
