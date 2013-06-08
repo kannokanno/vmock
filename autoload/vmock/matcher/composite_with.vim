@@ -19,15 +19,17 @@ function! vmock#matcher#composite_with#make_instance(matchers)
   endif
 
   let obj = s:prototype(map(deepcopy(a:matchers), 's:convert_matcher(v:val)'))
-  function! obj.match(...)
-    if a:0 !=# self.__matchers_len
-      let msg = printf('expected %d args, but %d args were passed.', self.__matchers_len, a:0)
+
+  " 必ず各引数を配列にした形で受け取る([] | [arg1, arg2 ...])
+  function! obj.match(args)
+    if len(a:args) !=# self.__matchers_len
+      let msg = printf('expected %d args, but %d args were passed.', self.__matchers_len, len(a:args))
       call vmock#exception#throw(msg)
     endif
 
     " TODO match結果の状態をどう持つか(true/falseなのか詳細かメッセージか)
     for i in range(self.__matchers_len)
-      call self.__matchers[i].match(a:000[i])
+      call self.__matchers[i].match(a:args[i])
     endfor
     return 1
   endfunction

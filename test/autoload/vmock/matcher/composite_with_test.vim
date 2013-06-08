@@ -15,7 +15,7 @@ endfunction
 " match関数が定義されていればそのまま保持する
 function! s:t.when_arg_is_match_obj()
   let matcher_stub = {'name': 'stub'}
-  function! matcher_stub.match(...)
+  function! matcher_stub.match(args)
   endfunction
 
   let composite = vmock#matcher#composite_with#make_instance([matcher_stub])
@@ -38,7 +38,7 @@ endfunction
 
 function! s:t.multiple_args()
   let matcher_stub = {'name': 'stub'}
-  function! matcher_stub.match(...)
+  function! matcher_stub.match(args)
   endfunction
 
   let composite = vmock#matcher#composite_with#make_instance([1, matcher_stub, ['b']])
@@ -53,21 +53,20 @@ let s:t = vimtest#new('vmock#matcher#composite_with#match()')
 
 function! s:t.empty_obj_match_is_always_success()
   let matcher = vmock#matcher#composite_with#empty_instance()
-  call self.assert.true(matcher.match())
-  call self.assert.true(matcher.match(1))
-  call self.assert.true(matcher.match(1, 2))
+  call self.assert.true(matcher.match([1]))
+  call self.assert.true(matcher.match([1, 2]))
 endfunction
 
 function! s:t.mismatch_arg_nums_when_too_many()
   let composite = vmock#matcher#composite_with#make_instance([1, 'AA'])
   call self.assert.throw('VMockException:expected 2 args, but 3 args were passed.')
-  call self.assert.true(composite.match(1, 2, 3))
+  call self.assert.true(composite.match([1, 2, 3]))
 endfunction
 
 function! s:t.mismatch_arg_nums_when_not_enough()
   let composite = vmock#matcher#composite_with#make_instance([1, 'AA'])
   call self.assert.throw('VMockException:expected 2 args, but 1 args were passed.')
-  call self.assert.true(composite.match(1))
+  call self.assert.true(composite.match([1]))
 endfunction
 
 function! s:t.called_each_obj_match()
@@ -75,7 +74,7 @@ function! s:t.called_each_obj_match()
         \ s:make_stub(10),
         \ s:make_stub(20),
         \ s:make_stub(30)])
-  call composite.match(10, 20, 30)
+  call composite.match([10, 20, 30])
 
   " matchに成功したのでカウントアップされていることを確認する
   let matchers = composite.get_matchers()

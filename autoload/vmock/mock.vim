@@ -26,7 +26,6 @@ function! vmock#mock#new()
   endfunction
 
   function! mock.teardown()
-    " TODO test
     for define in self.__original_defines
       call s:remembar_define(define)
     endfor
@@ -35,14 +34,20 @@ function! vmock#mock#new()
   return mock
 endfunction
 
+" @args 引数の配列。([] | [arg1, arg2 ...])
 function! vmock#mock#called(funcname, args)
-  "let expect = s:expects[a:funcname]
-  "call expect.get_counter().called()
-  "call expect.get_matcher().match(a:args)
+  if !has_key(s:expects, a:funcname)
+    call vmock#exception#throw(printf('The mock(%s) is not registered.', a:funcname))
+  endif
+  let expect = s:expects[a:funcname]
+  call expect.get_counter().called()
+  return expect.get_matcher().match(a:args)
 endfunction
 
 function! vmock#mock#return(funcname)
-  " TODO test
+  if !has_key(s:expects, a:funcname)
+    call vmock#exception#throw(printf('The mock(%s) is not registered.', a:funcname))
+  endif
   let expect = s:expects[a:funcname]
   return expect.get_return_value()
 endfunction
