@@ -1,3 +1,36 @@
+let s:t = vimtest#new('vmock#mock#new function()') "{{{
+
+function! s:t.setup()
+  function! g:vmock_global_func()
+    return 10
+  endfunction
+endfunction
+
+function! s:t.teardown()
+  delfunction g:vmock_global_func
+endfunction
+
+function! s:t.add_original_defines()
+  let mock = vmock#mock#new()
+  call self.assert.equals(0, len(mock.__original_defines))
+  call mock.function('g:vmock_global_func')
+  call self.assert.equals(1, len(mock.__original_defines))
+
+  let expected = deepcopy(mock.__original_defines)
+  " 同じ関数に対しては重複登録しない
+  call mock.function('g:vmock_global_func')
+  call self.assert.equals(1, len(mock.__original_defines))
+  call self.assert.equals(expected, mock.__original_defines)
+endfunction
+
+function! s:t.override_mock()
+  let mock = vmock#mock#new()
+  call self.assert.equals(10, g:vmock_global_func())
+  call mock.function('g:vmock_global_func')
+  " モック化したあとのreturnの初期値は0
+  call self.assert.equals(0, g:vmock_global_func())
+endfunction
+"}}}
 let s:t = vimtest#new('vmock#mock#new teardown()') "{{{
 
 function! s:t.setup()

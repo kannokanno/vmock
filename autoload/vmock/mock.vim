@@ -6,12 +6,14 @@ set cpo&vim
 let s:expects = {}
 
 function! vmock#mock#new()
-  let mock = {'__original_defines': []}
+  let mock = {'__original_defines': {}}
 
   function! mock.function(funcname)
-    " TODO test
     let original_define = vmock#function_define#get(a:funcname)
-    call add(self.__original_defines, original_define)
+    if !has_key(self.__original_defines, a:funcname)
+      let self.__original_defines[a:funcname] = original_define
+    endif
+
     call vmock#function_define#override_mock(original_define)
     let expect = vmock#expect#new(a:funcname)
     let s:expects[a:funcname] = expect
@@ -26,7 +28,7 @@ function! vmock#mock#new()
   endfunction
 
   function! mock.teardown()
-    for define in self.__original_defines
+    for define in values(self.__original_defines)
       call s:remembar_define(define)
     endfor
   endfunction
