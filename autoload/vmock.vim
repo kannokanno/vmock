@@ -3,10 +3,11 @@
 let s:save_cpo = &cpo
 set cpo&vim
 
-function! vmock#mock()
+function! vmock#mock(funcname)
   let mock = vmock#mock#new()
+  let expect = mock.function(a:funcname)
   call vmock#container#add_mock(mock)
-  return mock
+  return expect
 endfunction
 
 " matcher shortcurt api's"{{{

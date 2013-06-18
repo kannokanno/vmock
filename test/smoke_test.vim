@@ -7,7 +7,7 @@ let s:t = g:vmock_test_new('mock of global function(g:)')
 function! s:t.no_args_and_return_mock_num()
   let g:vmock_testdata = s:provider.g_colon_no_args()
   call self.assert.equals(g:vmock_testdata.original_result, g:vmock_testdata.funccall())
-  call vmock#mock().function(g:vmock_testdata.funcname).return(100)
+  call vmock#mock(g:vmock_testdata.funcname).return(100)
   call self.assert.equals(100, g:vmock_testdata.funccall())
 endfunction
 
@@ -15,7 +15,7 @@ endfunction
 function! s:t.no_args_and_no_return()
   let g:vmock_testdata = s:provider.g_colon_no_args_no_return()
   call self.assert.equals(g:vmock_testdata.original_result, g:vmock_testdata.funccall())
-  call vmock#mock().function(g:vmock_testdata.funcname)
+  call vmock#mock(g:vmock_testdata.funcname)
   " 変更されていないことの確認
   call self.assert.equals(g:vmock_testdata.original_result, g:vmock_testdata.funccall())
 endfunction
@@ -24,6 +24,6 @@ endfunction
 function! s:t.no_args_and_no_return()
   let g:vmock_testdata = s:provider.g_colon_no_args_no_return()
   call self.assert.equals(g:vmock_testdata.original_result, g:vmock_testdata.funccall())
-  call vmock#mock().function(g:vmock_testdata.funcname).return(200)
+  call vmock#mock(g:vmock_testdata.funcname).return(200)
   call self.assert.equals(200, g:vmock_testdata.funccall())
 endfunction

@@ -1,15 +1,25 @@
-let s:t = vimtest#new('vmock#mock()')"{{{
+let s:t = vimtest#new('vmock#mock()') "{{{
+
+function! s:t.setup()
+  function! g:vmock_global_func()
+    return 10
+  endfunction
+endfunction
+
+function! s:t.teardown()
+  delfunction g:vmock_global_func
+endfunction
 
 " TODO 今のところ疎通テストのみ
 function! s:t.new_mock()
-  call self.assert.false(empty(vmock#mock()))
+  call self.assert.false(empty(vmock#mock('g:vmock_global_func')))
 endfunction
 
 function! s:t.add_container_when_new_mock()
   call self.assert.equals(0, len(vmock#container#get_mocks()))
-  call vmock#mock()
+  call vmock#mock('g:vmock_global_func')
   call self.assert.equals(1, len(vmock#container#get_mocks()))
-  call vmock#mock()
+  call vmock#mock('g:vmock_global_func')
   call self.assert.equals(2, len(vmock#container#get_mocks()))
 endfunction
 "}}}
