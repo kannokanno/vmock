@@ -20,5 +20,17 @@ function! vmock#results#get_all(funcname)
   return s:results_each_func[a:funcname]
 endfunction
 
+function! vmock#results#is_success(funcname)
+  if !has_key(s:results_each_func, a:funcname)
+    call vmock#exception#throw(printf('It is a function not existing. [%s]', a:funcname))
+  endif
+  for r in s:results_each_func[a:funcname]
+    if r.is_success !=# 1
+      return 0
+    endif
+  endfor
+  return 1
+endfunction
+
 let &cpo = s:save_cpo
 unlet s:save_cpo
