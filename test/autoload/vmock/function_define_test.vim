@@ -1,3 +1,4 @@
+" TODO 細かいパターンは受け入れに回すということをここにも明記しておくか
 let s:t = vimtest#new('vmock#function_define#get() - g:func') "{{{
 
 function! s:t.teardown()
