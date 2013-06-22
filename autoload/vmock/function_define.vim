@@ -41,8 +41,8 @@ function! s:get_body(define_lines)
   endif
   " function!行とendfunction行は除外
   " :function Foo で出力された際の行番号を削除
-  " NOTE: 半角空白インデントが2つくらい余計につく
-  return join(map(a:define_lines[1:len(a:define_lines) - 2], 'substitute(v:val, "^[0-9]*", "", "")'), "\n")
+  " NOTE: 半角空白インデントが2つくらい余計につくのでそれも取り除く
+  return join(map(a:define_lines[1:len(a:define_lines) - 2], 'substitute(v:val, "^[0-9]*  ", "", "")'), "\n")
 endfunction
 
 function! vmock#function_define#override_mock(define)

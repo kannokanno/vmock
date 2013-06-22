@@ -51,7 +51,7 @@ function! s:t.one_line_body()
   let define = vmock#function_define#get('g:vmock_global_func')
   call self.assert.equals('g:vmock_global_func', define.funcname)
   call self.assert.equals(join([
-        \ '      return s:hogehoge()',
+        \ '    return s:hogehoge()',
         \ ], "\n"), define.body)
 endfunction
 
@@ -67,12 +67,12 @@ function! s:t.multi_line_body()
   let define = vmock#function_define#get('g:vmock_global_func')
   call self.assert.equals('g:vmock_global_func', define.funcname)
   call self.assert.equals(join([
-        \ "      let a = 1",
-        \ "      let b = 2",
-        \ "      if a ==# b",
-        \ "        return 'hoge'",
-        \ "      endif",
-        \ "      return 'piyo'"
+        \ "    let a = 1",
+        \ "    let b = 2",
+        \ "    if a ==# b",
+        \ "      return 'hoge'",
+        \ "    endif",
+        \ "    return 'piyo'"
         \ ], "\n"), define.body)
 endfunction
 
@@ -87,11 +87,11 @@ function! s:t.multi_line_and_no_return_body()
   let define = vmock#function_define#get('g:vmock_global_func')
   call self.assert.equals('g:vmock_global_func', define.funcname)
   call self.assert.equals(join([
-        \ "      let a = 1",
-        \ "      let b = 2",
-        \ "      if a ==# b",
-        \ "        echo 'OK!'",
-        \ "      endif",
+        \ "    let a = 1",
+        \ "    let b = 2",
+        \ "    if a ==# b",
+        \ "      echo 'OK!'",
+        \ "    endif",
         \ ], "\n"), define.body)
 endfunction
 "}}}
@@ -211,7 +211,10 @@ endfunction
 let s:t = vimtest#new('vmock#function_define#override() - autoload#func') "{{{
 
 function! s:t.teardown()
-  " TODO vmock_for_test#funcの定義戻さないとなあ
+  " TODO 元コードの再定義をベタ書きしてしまっている
+  function! vmock_for_test#func()
+    return 10
+  endfunction
 endfunction
 
 function! s:t.override()
