@@ -8,7 +8,11 @@ let s:expects = {}
 function! vmock#mock#new()
   let mock = {'__original_defines': {}}
 
-  function! mock.function(funcname)
+  function! mock.func(funcname)
+    if stridx(a:funcname, 's:') ==# 0
+      call vmock#exception#throw('There is the necessity for a global function.')
+    endif
+
     let original_define = vmock#function_define#get(a:funcname)
     if !has_key(self.__original_defines, a:funcname)
       let self.__original_defines[a:funcname] = original_define

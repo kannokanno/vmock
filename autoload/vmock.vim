@@ -5,7 +5,7 @@ set cpo&vim
 
 function! vmock#mock(funcname)
   let mock = vmock#mock#new()
-  let expect = mock.function(a:funcname)
+  let expect = mock.func(a:funcname)
   call vmock#container#add_mock(mock)
   return expect
 endfunction
