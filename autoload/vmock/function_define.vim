@@ -49,7 +49,7 @@ function! vmock#function_define#override_mock(define)
   let mock_body = vmock#function_define#build_mock_body(a:define)
   call vmock#function_define#override(a:define.funcname, a:define.arg_names, mock_body)
 endfunction
-function
+
 function! vmock#function_define#override(funcname, arg_names, body)
   if empty(a:funcname)
     throw vmock#exception#throw('Function name required')
