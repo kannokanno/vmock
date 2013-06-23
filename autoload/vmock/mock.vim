@@ -8,6 +8,8 @@ let s:expects = {}
 function! vmock#mock#new()
   let mock = {'__original_defines': {}}
 
+  " TODO これ自体がmock#new(func)になるべきじゃないのか
+        " そうなるとmock#new()の戻り値がexpectなのは変なので修正しないとダメ
   function! mock.func(funcname)
     if stridx(a:funcname, 's:') ==# 0
       call vmock#exception#throw('There is the necessity for a global function.')
@@ -24,11 +26,9 @@ function! vmock#mock#new()
     return expect
   endfunction
 
+  " TODO 
   function! mock.verify()
-    " TODO 結果保持の仕様
-    " for expect in self.__expects
-    "   call expect.verify()
-    " endfor
+    " 
   endfunction
 
   function! mock.teardown()

@@ -5,6 +5,9 @@ set cpo&vim
 
 let s:mock_container = []
 
+" 1テストケース単位を想定
+" なのでget_mocksは関数名をもらわずすべて返している
+
 function! vmock#container#add_mock(mock)
   if !has_key(a:mock, 'verify')
     call vmock#exception#throw('mock obj must be implement verify()')

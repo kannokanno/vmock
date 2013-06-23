@@ -1,4 +1,4 @@
-let s:t = vimtest#new('vmock#mock#new function()') "{{{
+let s:t = vimtest#new('vmock#mock#new func()') "{{{
 
 function! s:t.setup()
   function! g:vmock_global_func()
