@@ -10,7 +10,6 @@ function! vmock#matcher#with#any()
   function! m.match(...)
     return 1 ==# 1
   endfunction
-  call m.update_status(1) " always success
   return m
 endfunction
 
@@ -86,17 +85,7 @@ function! vmock#matcher#with#custom(eq_op_name)
 endfunction
 
 function! s:prototype()
-  let m = {'__match_status': -1, '__fail_format': ''}
-  function! m.result()
-    return self.__match_status ==# -1 ? 0 : self.__match_status
-  endfunction
-
-  function! m.update_status(status)
-    " 一度も失敗していない場合のみ更新する
-    if self.__match_status !=# 0
-      let self.__match_status = a:status
-    endif
-  endfunction
+  let m = {'__fail_format': ''}
 
   function! m.make_fail_message(args_index, actual)
     if empty(self.__fail_format)
@@ -114,9 +103,7 @@ function! s:build_eq_matcher(expected, eq_op_name)
   let m.__eq_op_name = a:eq_op_name
 
   function! m.match(actual)
-    let result = call(self.__eq_op_name, [self.__expected, a:actual])
-    call self.update_status(result)
-    return result
+    return call(self.__eq_op_name, [self.__expected, a:actual])
   endfunction
 
   return m

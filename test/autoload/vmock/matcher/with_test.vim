@@ -1,4 +1,4 @@
-let s:t = vimtest#new('vmock#with#any()')
+let s:t = vimtest#new('vmock#with#any()') "{{{
 
 function! s:t.no_arg()
   let matcher = vmock#matcher#with#any()
@@ -12,9 +12,8 @@ function! s:t.wtih_arg()
     unlet Arg
   endfor
 endfunction
-
-
-let s:t = vimtest#new('vmock#with#eq()')
+"}}}
+let s:t = vimtest#new('vmock#with#eq()') "{{{
 
 function! s:t.match()
   for Arg in s:arg_data_provider()
@@ -30,9 +29,8 @@ function! s:t.match_ignorecase()
   call self.assert.true(matcher.match('Abc'))
   call self.assert.false(matcher.match('abc'))
 endfunction
-
-
-let s:t = vimtest#new('vmock#with#not_eq()')
+"}}}
+let s:t = vimtest#new('vmock#with#not_eq()') "{{{
 
 function! s:t.match()
   for Arg in s:arg_data_provider()
@@ -48,9 +46,8 @@ function! s:t.match_ignorecase()
   call self.assert.false(matcher.match('Abc'))
   call self.assert.true(matcher.match('abc'))
 endfunction
-
-
-let s:t = vimtest#new('vmock#with#loose_eq()')
+"}}}
+let s:t = vimtest#new('vmock#with#loose_eq()') "{{{
 
 function! s:t.match()
   for Arg in s:arg_data_provider()
@@ -66,9 +63,8 @@ function! s:t.match_ignorecase()
   call self.assert.true(matcher.match('Abc'))
   call self.assert.true(matcher.match('abc'))
 endfunction
-
-
-let s:t = vimtest#new('vmock#with#loose_not_eq()')
+"}}}
+let s:t = vimtest#new('vmock#with#loose_not_eq()') "{{{
 
 function! s:t.match()
   for Arg in s:arg_data_provider()
@@ -84,9 +80,8 @@ function! s:t.match_ignorecase()
   call self.assert.false(matcher.match('Abc'))
   call self.assert.false(matcher.match('abc'))
 endfunction
-
-
-let s:t = vimtest#new('vmock#with#type()')
+"}}}
+let s:t = vimtest#new('vmock#with#type()') "{{{
 
 function! s:t.match()
   call self.assert.true(vmock#matcher#with#type(1).match(0))
@@ -122,9 +117,8 @@ function! s:t.not_match()
 
   call self.assert.true(vmock#matcher#with#not_type({}).match(10))
 endfunction
-
-
-let s:t = vimtest#new('vmock#with#has()')
+"}}}
+let s:t = vimtest#new('vmock#with#has()') "{{{
 
 function! s:t.match_invalid_type()
   let matcher = vmock#matcher#with#has('key')
@@ -150,9 +144,8 @@ function! s:t.match_dict()
   call self.assert.true(matcher.match({'key': 10}))
   call self.assert.true(matcher.match({'fake-key': 10, 'key': 10}))
 endfunction
-
-
-let s:t = vimtest#new('vmock#with#custom()')
+"}}}
+let s:t = vimtest#new('vmock#with#custom()') "{{{
 
 function! s:t.global_func()
   function! g:vmock_with_test_custom_func(args)
@@ -166,32 +159,8 @@ function! s:t.global_func()
 
   delfunction g:vmock_with_test_custom_func
 endfunction
-
-
-let s:t = vimtest#new('with.result()')
-
-function! s:t.any_is_always_success()
-  let matcher = vmock#matcher#with#any()
-  call self.assert.true(matcher.result())
-  call matcher.match()
-  call self.assert.true(matcher.result())
-endfunction
-
-function! s:t.excpet_any_matcher()
-  let matcher = vmock#matcher#with#eq(1)
-  call self.assert.false(matcher.result())
-  call matcher.match(1)
-  call self.assert.true(matcher.result())
-
-  " 全ての呼び出しの中で1回でもマッチに失敗するとfail
-  call matcher.match(0)
-  call self.assert.false(matcher.result()) " falseになる
-  call matcher.match(1)
-  call self.assert.false(matcher.result()) " falseのまま
-endfunction
-
-
-function! s:arg_data_provider()
+"}}}
+function! s:arg_data_provider() "{{{
   return [
         \ 0, 10, -100,
         \ '', 'aaa',
@@ -201,3 +170,4 @@ function! s:arg_data_provider()
         \ function('tr'), function('vmock#mock')
         \]
 endfunction
+"}}}
