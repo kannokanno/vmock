@@ -37,6 +37,12 @@ function! s:t.override_mock()
   call self.assert.equals(0, g:vmock_global_func())
 endfunction
 "}}}
+let s:t = vimtest#new('vmock#mock#new verify()') "{{{
+
+function! s:t.__skip()
+  " TODO 単体テストできず(UATではテストしている)
+endfunction
+"}}}
 let s:t = vimtest#new('vmock#mock#new teardown()') "{{{
 
 function! s:t.setup()

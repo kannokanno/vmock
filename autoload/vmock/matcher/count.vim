@@ -5,7 +5,7 @@ set cpo&vim
 
 function! vmock#matcher#count#once()
   let m = s:prototype('once')
-  function! m.match()
+  function! m.validate()
     return self.__called_count ==# 1
   endfunction
   return m
@@ -14,7 +14,7 @@ endfunction
 function! vmock#matcher#count#times(expected)
   let m = s:prototype('times')
   let m.__expected_count = a:expected
-  function! m.match()
+  function! m.validate()
     return self.__called_count ==# self.__expected_count
   endfunction
   return m
@@ -23,7 +23,7 @@ endfunction
 function! vmock#matcher#count#at_least(expected)
   let m = s:prototype('at_least')
   let m.__expected_count = a:expected
-  function! m.match()
+  function! m.validate()
     return self.__expected_count <= self.__called_count
   endfunction
   return m
@@ -32,7 +32,7 @@ endfunction
 function! vmock#matcher#count#at_most(expected)
   let m = s:prototype('at_most')
   let m.__expected_count = a:expected
-  function! m.match()
+  function! m.validate()
     return self.__called_count <= self.__expected_count
   endfunction
   return m
@@ -40,7 +40,7 @@ endfunction
 
 function! vmock#matcher#count#any()
   let m = s:prototype('any')
-  function! m.match()
+  function! m.validate()
     return 1 == 1
   endfunction
   return m
@@ -48,7 +48,7 @@ endfunction
 
 function! vmock#matcher#count#never()
   let m = s:prototype('never')
-  function! m.match()
+  function! m.validate()
     return self.__called_count < 1
   endfunction
   return m
@@ -62,7 +62,7 @@ function! s:prototype(name)
     let self.__called_count += 1
   endfunction
 
-  function! counter.match()
+  function! counter.validate()
     " this function must be override
     call vmock#exception#throw('must be override')
   endfunction

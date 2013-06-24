@@ -19,6 +19,7 @@ function! g:make_test()
   endfunction
 
   function! t.setup()
+    call vmock#container#clear()
     call vmock#for_test#testdata#dict_init()
   endfunction
 

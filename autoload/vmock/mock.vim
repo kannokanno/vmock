@@ -22,13 +22,16 @@ function! vmock#mock#new()
 
     call vmock#function_define#override_mock(original_define)
     let expect = vmock#expect#new(a:funcname)
+    let self.__expect = expect
+
+    " TODO expects というよりmocks?でもそれならcontainarが...
     let s:expects[a:funcname] = expect
     return expect
   endfunction
 
-  " TODO 
+  " TODO 単なる委譲...
   function! mock.verify()
-    " 
+    return self.__expect.verify()
   endfunction
 
   function! mock.teardown()
@@ -47,7 +50,8 @@ function! vmock#mock#called(funcname, args)
   endif
   let expect = s:expects[a:funcname]
   call expect.get_counter().called()
-  return expect.get_matcher().match(a:args)
+  return 1
+  "return expect.get_matcher().match(a:args)
 endfunction
 
 function! vmock#mock#return(funcname)
@@ -59,7 +63,9 @@ function! vmock#mock#return(funcname)
 endfunction
 
 function! s:remembar_define(original_define)
-  call vmock#function_define#override(a:original_define.funcname, a:original_define.arg_names, a:original_define.body)
+  if exists('*' . a:original_define.funcname)
+    call vmock#function_define#override(a:original_define.funcname, a:original_define.arg_names, a:original_define.body)
+  endif
 endfunction
 
 let &cpo = s:save_cpo

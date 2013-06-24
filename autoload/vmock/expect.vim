@@ -48,9 +48,11 @@ function! vmock#expect#new(funcname)
   endfunction
 
   function! expect.verify()
-    " TODO 結果の扱い
-    " call s:args_matcher.result()
-    " call s:count_validater.validate()
+    let result = {'is_fail': 0}
+    if !self.get_counter().validate()
+      let result.is_fail = 1
+    endif
+    return result
   endfunction
 
   function! expect.get_return_value()
