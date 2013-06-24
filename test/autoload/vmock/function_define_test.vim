@@ -213,25 +213,25 @@ let s:t = vimtest#new('vmock#function_define#override() - autoload#func') "{{{
 
 function! s:t.teardown()
   " TODO 元コードの再定義をベタ書きしてしまっている
-  function! vmock_for_test#func()
+  function! vmock#for_test#testdata#func()
     return 10
   endfunction
 endfunction
 
 function! s:t.override()
-  " vmock/autoload/vmock_for_test.vimに定義あり
+  " vmock#for_test#testdata#funcに定義あり
   " NOTE:一度autoload関数を呼び出すか、対象ファイルをsourceしないと再定義できない
   "      source制御は別ファイルの処理で行うので、ここのテストでは明示的に呼び出している
-  call self.assert.equals(10, vmock_for_test#func())
-  call vmock#function_define#override('vmock_for_test#func', [], 'return 100')
+  call self.assert.equals(10, vmock#for_test#testdata#func())
+  call vmock#function_define#override('vmock#for_test#testdata#func', [], 'return 100')
 
-  call self.assert.equals(100, vmock_for_test#func())
+  call self.assert.equals(100, vmock#for_test#testdata#func())
   call self.assert.equals(join([
         \ '',
-        \ '   function vmock_for_test#func()',
+        \ '   function vmock#for_test#testdata#func()',
         \ '1  return 100',
         \ '   endfunction',
-        \ ], "\n"), s:get_define_string('vmock_for_test#func'))
+        \ ], "\n"), s:get_define_string('vmock#for_test#testdata#func'))
 endfunction
 "}}}
 let s:t = vimtest#new('vmock#function_define#override() - g:dict.func') "{{{

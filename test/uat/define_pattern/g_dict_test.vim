@@ -115,10 +115,12 @@ endfunction
 function! s:t.no_return()
   call vmock#mock(self._no_return_func_name).with(vmock#eq(10))
   call g:vmock_test_dict.no_return(10)
+  call self.assert.success()
 endfunction
 
 function! s:t.exists_return()
   call vmock#mock(self._exists_return_func_name).with(vmock#eq(10))
   call g:vmock_test_dict.exists_return(10)
+  call self.assert.success()
 endfunction
 "}}}
