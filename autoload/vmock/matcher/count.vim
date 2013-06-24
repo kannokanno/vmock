@@ -3,10 +3,17 @@
 let s:save_cpo = &cpo
 set cpo&vim
 
+" TODO make_fail_message test -> UAT書いているからいらないか...?
+
 function! vmock#matcher#count#once()
   let m = s:prototype('once')
+  let m.__expected_count = 1
   function! m.validate()
-    return self.__called_count ==# 1
+    return self.__called_count ==# self.__expected_count
+  endfunction
+
+  function! m.make_fail_message()
+    return printf('expected: only once. but received: %d times.', self.__called_count)
   endfunction
   return m
 endfunction
@@ -17,23 +24,9 @@ function! vmock#matcher#count#times(expected)
   function! m.validate()
     return self.__called_count ==# self.__expected_count
   endfunction
-  return m
-endfunction
 
-function! vmock#matcher#count#at_least(expected)
-  let m = s:prototype('at_least')
-  let m.__expected_count = a:expected
-  function! m.validate()
-    return self.__expected_count <= self.__called_count
-  endfunction
-  return m
-endfunction
-
-function! vmock#matcher#count#at_most(expected)
-  let m = s:prototype('at_most')
-  let m.__expected_count = a:expected
-  function! m.validate()
-    return self.__called_count <= self.__expected_count
+  function! m.make_fail_message()
+    return printf('expected: exactly %d times. but received: %d times.', self.__expected_count, self.__called_count)
   endfunction
   return m
 endfunction
@@ -51,6 +44,36 @@ function! vmock#matcher#count#never()
   function! m.validate()
     return self.__called_count < 1
   endfunction
+
+  function! m.make_fail_message()
+    return printf('expected: never call. but received: %d times.', self.__called_count)
+  endfunction
+  return m
+endfunction
+
+function! vmock#matcher#count#at_least(expected)
+  let m = s:prototype('at_least')
+  let m.__expected_count = a:expected
+  function! m.validate()
+    return self.__expected_count <= self.__called_count
+  endfunction
+
+  function! m.make_fail_message()
+    return printf('expected: at least %d times. but received: %d times.', self.__expected_count, self.__called_count)
+  endfunction
+  return m
+endfunction
+
+function! vmock#matcher#count#at_most(expected)
+  let m = s:prototype('at_most')
+  let m.__expected_count = a:expected
+  function! m.validate()
+    return self.__called_count <= self.__expected_count
+  endfunction
+
+  function! m.make_fail_message()
+    return printf('expected: at most %d times. but received: %d times.', self.__expected_count, self.__called_count)
+  endfunction
   return m
 endfunction
 
@@ -67,6 +90,10 @@ function! s:prototype(name)
     call vmock#exception#throw('must be override')
   endfunction
 
+  function! counter.make_fail_message()
+    " empty message
+    return ''
+  endfunction
   return counter
 endfunction
 

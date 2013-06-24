@@ -47,20 +47,18 @@ function! vmock#expect#new(funcname)
     return self.__set_counter(vmock#matcher#count#never())
   endfunction
 
-  " TODO test
+  " TODO test -> UAT書いているからいらないか...?
   function! expect.verify()
-    let result = {'is_fail': 0}
-
-    if !self.get_counter().validate()
-      let result.is_fail = 1
-      return result
+    let counter = self.get_counter()
+    if !counter.validate()
+      return s:make_verify_fail_result(counter)
     endif
 
-    if !self.get_matcher().validate()
-      let result.is_fail = 1
-      return result
+    let matcher = self.get_matcher()
+    if !matcher.validate()
+      return s:make_verify_fail_result(matcher)
     endif
-    return result
+    return s:make_verify_result(1, 'Success')
   endfunction
 
   function! expect.get_return_value()
@@ -81,6 +79,15 @@ function! vmock#expect#new(funcname)
   endfunction
 
   return expect
+endfunction
+
+function! s:make_verify_result(is_success, message)
+  let result = {'is_fail': a:is_success !=# 1, 'message': a:message}
+  return result
+endfunction
+
+function! s:make_verify_fail_result(matcher)
+  return s:make_verify_result(0, a:matcher.make_fail_message())
 endfunction
 
 let &cpo = s:save_cpo

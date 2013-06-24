@@ -24,11 +24,13 @@ function! vmock#matcher#with_group#make_instance(matchers)
   function! obj.match(args)
     if len(a:args) !=# self.__matchers_len
       let msg = printf('expected %d args, but %d args were passed.', self.__matchers_len, len(a:args))
+      " TODO 例外じゃなくて失敗扱いだな(testも)
       call vmock#exception#throw(msg)
     endif
 
     for i in range(self.__matchers_len)
       if !self.__matchers[i].match(a:args[i])
+        let self.__fail_message = self.__matchers[i].make_fail_message(i, a:args[i])
         return 0
       endif
     endfor
@@ -47,7 +49,7 @@ function! s:convert_matcher(src)
 endfunction
 
 function! s:prototype(matchers)
-  let obj = {'__matchers': a:matchers, '__matchers_len': len(a:matchers)}
+  let obj = {'__matchers': a:matchers, '__matchers_len': len(a:matchers), '__fail_message': ''}
   function! obj.get_matchers()
     return self.__matchers
   endfunction
@@ -58,6 +60,10 @@ function! s:prototype(matchers)
 
   function! obj.validate()
     return self.match(self.__actual_args)
+  endfunction
+
+  function! obj.make_fail_message()
+    return self.__fail_message
   endfunction
 
   return obj
