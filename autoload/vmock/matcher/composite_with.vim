@@ -27,9 +27,10 @@ function! vmock#matcher#composite_with#make_instance(matchers)
       call vmock#exception#throw(msg)
     endif
 
-    " TODO match結果の状態をどう持つか(true/falseなのか詳細かメッセージか)
     for i in range(self.__matchers_len)
-      call self.__matchers[i].match(a:args[i])
+      if !self.__matchers[i].match(a:args[i])
+        return 0
+      endif
     endfor
     return 1
   endfunction
@@ -50,6 +51,15 @@ function! s:prototype(matchers)
   function! obj.get_matchers()
     return self.__matchers
   endfunction
+
+  function! obj.record(args)
+    let self.__actual_args = a:args
+  endfunction
+
+  function! obj.validate()
+    return self.match(self.__actual_args)
+  endfunction
+
   return obj
 endfunction
 

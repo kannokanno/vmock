@@ -47,10 +47,18 @@ function! vmock#expect#new(funcname)
     return self.__set_counter(vmock#matcher#count#never())
   endfunction
 
+  " TODO test
   function! expect.verify()
     let result = {'is_fail': 0}
+
     if !self.get_counter().validate()
       let result.is_fail = 1
+      return result
+    endif
+
+    if !self.get_matcher().validate()
+      let result.is_fail = 1
+      return result
     endif
     return result
   endfunction

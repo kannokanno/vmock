@@ -50,8 +50,8 @@ function! vmock#mock#called(funcname, args)
   endif
   let expect = s:expects[a:funcname]
   call expect.get_counter().called()
+  call expect.get_matcher().record(a:args)
   return 1
-  "return expect.get_matcher().match(a:args)
 endfunction
 
 function! vmock#mock#return(funcname)

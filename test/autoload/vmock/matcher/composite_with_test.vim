@@ -89,6 +89,7 @@ function! s:make_stub(init_num)
     if a:arg ==# self.num
       let self.num += 1
     endif
+    return 1
   endfunction
   return stub
 endfunction

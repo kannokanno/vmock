@@ -72,7 +72,7 @@ function! s:make_called_variable(arg_names)
   if a:arg_names[0] ==# '...'
     return 'a:000'
   endif
-  return '[' . join(map(deepcopy(a:arg_names), "\"'\" . v:val . \"'\""), ',') . ']'
+  return '[' . join(map(deepcopy(a:arg_names), "\"a:\" . v:val"), ',') . ']'
 endfunction
 
 let &cpo = s:save_cpo
