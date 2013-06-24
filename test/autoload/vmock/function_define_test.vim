@@ -266,14 +266,14 @@ let s:t = vimtest#new('vmock#function_define#build_mock_body()') "{{{
 
 function! s:t.build_mock_body()
   let patterns = [
-        \ ['g:vmock_test_func', []],
-        \ ['hoge#hoge', ['a', 'bb']],
-        \ ['Global', ['...']],
-        \ ['g:dict.hoge', ['one']],
+        \ ['g:vmock_test_func', [], '[]'],
+        \ ['hoge#hoge', ['a', 'bb'], "['a','bb']"],
+        \ ['Global', ['...'], 'a:000'],
+        \ ['g:dict.hoge', ['one'], "['one']"],
         \]
   for pat in patterns
-    let expected = s:expected_statement(pat[0], pat[1])
     let actual = vmock#function_define#build_mock_body(s:stub_define(pat[0], pat[1]))
+    let expected = s:expected_statement(pat[0], pat[2])
     call self.assert.equals(expected, actual)
   endfor
 endfunction
@@ -282,9 +282,8 @@ function! s:stub_define(funcname, arg_names)
   return {'funcname': a:funcname, 'arg_names': a:arg_names}
 endfunction
 
-function! s:expected_statement(funcname, arg_names)
-  let quoted_args = join(map(deepcopy(a:arg_names), "\"'\" . v:val . \"'\""), ',')
-  let s = printf("call vmock#mock#called('%s', [%s])", a:funcname, quoted_args)
+function! s:expected_statement(funcname, arg_variable)
+  let s = printf("call vmock#mock#called('%s', %s)", a:funcname, a:arg_variable)
   let s .= "\n"
   let s .= printf("return vmock#mock#return('%s')", a:funcname)
   return s

@@ -57,12 +57,22 @@ function! vmock#function_define#override(funcname, arg_names, body)
   execute printf("function! %s(%s)\n%s\nendfunction", a:funcname, join(a:arg_names, ','), a:body)
 endfunction
 
+" TODO rename: build -> make
 function! vmock#function_define#build_mock_body(define)
-  let quoted_args = join(map(deepcopy(a:define.arg_names), "\"'\" . v:val . \"'\""), ',')
-  let called_statement = printf("call vmock#mock#called('%s', [%s])",
-        \ a:define.funcname, quoted_args)
+  let called_statement = printf("call vmock#mock#called('%s', %s)",
+        \ a:define.funcname, s:make_called_variable(a:define.arg_names))
   let return_statement = printf("return vmock#mock#return('%s')", a:define.funcname)
   return called_statement . "\n" . return_statement
+endfunction
+
+function! s:make_called_variable(arg_names)
+  if len(a:arg_names) < 1
+    return '[]'
+  endif
+  if a:arg_names[0] ==# '...'
+    return 'a:000'
+  endif
+  return '[' . join(map(deepcopy(a:arg_names), "\"'\" . v:val . \"'\""), ',') . ']'
 endfunction
 
 let &cpo = s:save_cpo
