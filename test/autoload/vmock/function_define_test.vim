@@ -265,14 +265,28 @@ endfunction
 let s:t = vimtest#new('vmock#function_define#build_mock_body()') "{{{
 
 function! s:t.build_mock_body()
-  call self.assert.equals("return vmock#mock#return('g:vmock_test_func')",
-        \ vmock#function_define#build_mock_body({'funcname': 'g:vmock_test_func'}))
-  call self.assert.equals("return vmock#mock#return('hoge#hoge')",
-        \ vmock#function_define#build_mock_body({'funcname': 'hoge#hoge'}))
-  call self.assert.equals("return vmock#mock#return('Global')",
-        \ vmock#function_define#build_mock_body({'funcname': 'Global'}))
-  call self.assert.equals("return vmock#mock#return('g:dict.hoge')",
-        \ vmock#function_define#build_mock_body({'funcname': 'g:dict.hoge'}))
+  let patterns = [
+        \ ['g:vmock_test_func', []],
+        \ ['hoge#hoge', ['a', 'bb']],
+        \ ['Global', ['...']],
+        \ ['g:dict.hoge', ['one']],
+        \]
+  for pat in patterns
+    let expected = s:expected_statement(pat[0], pat[1])
+    let actual = vmock#function_define#build_mock_body(s:stub_define(pat[0], pat[1]))
+    call self.assert.equals(expected, actual)
+  endfor
+endfunction
+
+function! s:stub_define(funcname, arg_names)
+  return {'funcname': a:funcname, 'arg_names': a:arg_names}
+endfunction
+
+function! s:expected_statement(funcname, arg_names)
+  let s = printf("call vmock#mock#called('%s', [%s])", a:funcname, join(a:arg_names, ','))
+  let s .= "\n"
+  let s .= printf("return vmock#mock#return('%s')", a:funcname)
+  return s
 endfunction
 "}}}
 

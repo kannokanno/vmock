@@ -58,12 +58,10 @@ function! vmock#function_define#override(funcname, arg_names, body)
 endfunction
 
 function! vmock#function_define#build_mock_body(define)
-  return printf("return vmock#mock#return('%s')", a:define.funcname)
-endfunction
-
-function! s:override_mock_define(define)
-  let body = printf("call vmock#mock#called('%s', [%s])\n%s", a:define.funcname, join(a:define.args, ','), a:define.body)
-  execute printf("function! %s(%s)\n%s\nendfunction", a:define.funcname, a:define.args, body)
+  let called_statement = printf("call vmock#mock#called('%s', [%s])",
+        \ a:define.funcname, join(a:define.arg_names, ','))
+  let return_statement = printf("return vmock#mock#return('%s')", a:define.funcname)
+  return called_statement . "\n" . return_statement
 endfunction
 
 let &cpo = s:save_cpo
