@@ -8,11 +8,16 @@ endfunction
 
 function! s:t.teardown()
   delfunction g:vmock_global_func
+  call vmock#container#clear()
 endfunction
 
-" TODO 今のところ疎通テストのみ
-function! s:t.new_mock()
-  call self.assert.false(empty(vmock#mock('g:vmock_global_func')))
+function! s:t.do_nothing()
+  let mock = vmock#mock('g:vmock_test_func')
+endfunction
+
+function! s:t.exeception_when_not_exists_func()
+  call self.assert.throw('VMockException:Function not found. (g:vmock_test_not_exists_func)')
+  call vmock#mock('g:vmock_test_not_exists_func')
 endfunction
 
 function! s:t.add_container_when_new_mock()
