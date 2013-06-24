@@ -3,17 +3,17 @@
 let s:save_cpo = &cpo
 set cpo&vim
 
-function! vmock#matcher#composite_with#empty_instance()
-  if !exists('g:vmock_composite_with_empty_obj')
-    let g:vmock_composite_with_empty_obj = s:prototype([])
-    function! g:vmock_composite_with_empty_obj.match(...)
+function! vmock#matcher#with_group#empty_instance()
+  if !exists('g:vmock_with_group_empty_obj')
+    let g:vmock_with_group_empty_obj = s:prototype([])
+    function! g:vmock_with_group_empty_obj.match(...)
       return 1 ==# 1
     endfunction
   endif
-  return g:vmock_composite_with_empty_obj
+  return g:vmock_with_group_empty_obj
 endfunction
 
-function! vmock#matcher#composite_with#make_instance(matchers)
+function! vmock#matcher#with_group#make_instance(matchers)
   if type(a:matchers) !=# type([])
     call vmock#exception#throw('arg type must be List')
   endif
