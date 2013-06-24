@@ -58,8 +58,9 @@ function! vmock#function_define#override(funcname, arg_names, body)
 endfunction
 
 function! vmock#function_define#build_mock_body(define)
+  let quoted_args = join(map(deepcopy(a:define.arg_names), "\"'\" . v:val . \"'\""), ',')
   let called_statement = printf("call vmock#mock#called('%s', [%s])",
-        \ a:define.funcname, join(a:define.arg_names, ','))
+        \ a:define.funcname, quoted_args)
   let return_statement = printf("return vmock#mock#return('%s')", a:define.funcname)
   return called_statement . "\n" . return_statement
 endfunction

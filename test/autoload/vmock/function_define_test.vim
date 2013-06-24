@@ -283,7 +283,8 @@ function! s:stub_define(funcname, arg_names)
 endfunction
 
 function! s:expected_statement(funcname, arg_names)
-  let s = printf("call vmock#mock#called('%s', [%s])", a:funcname, join(a:arg_names, ','))
+  let quoted_args = join(map(deepcopy(a:arg_names), "\"'\" . v:val . \"'\""), ',')
+  let s = printf("call vmock#mock#called('%s', [%s])", a:funcname, quoted_args)
   let s .= "\n"
   let s .= printf("return vmock#mock#return('%s')", a:funcname)
   return s
