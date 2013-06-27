@@ -25,7 +25,7 @@ function! s:make_test(name) "{{{
     for mock in vmock#container#get_mocks()
       let result = mock.verify()
       if result.is_fail
-        call self.assert.fail(result.get_message())
+        call self.assert.fail(result.message)
       endif
     endfor
     call self.assert.success()
