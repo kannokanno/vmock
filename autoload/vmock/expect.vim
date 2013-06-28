@@ -29,27 +29,27 @@ function! vmock#expect#new(funcname)
   endfunction
 
   function! expect.once()
-    return self.__set_counter(vmock#matcher#count#once())
+    return self.__update_counter(vmock#matcher#count#once())
   endfunction
 
   function! expect.times(count)
-    return self.__set_counter(vmock#matcher#count#times(a:count))
+    return self.__update_counter(vmock#matcher#count#times(a:count))
   endfunction
 
   function! expect.at_least(count)
-    return self.__set_counter(vmock#matcher#count#at_least(a:count))
+    return self.__update_counter(vmock#matcher#count#at_least(a:count))
   endfunction
 
   function! expect.at_most(count)
-    return self.__set_counter(vmock#matcher#count#at_most(a:count))
+    return self.__update_counter(vmock#matcher#count#at_most(a:count))
   endfunction
 
   function! expect.any()
-    return self.__set_counter(vmock#matcher#count#any())
+    return self.__update_counter(vmock#matcher#count#any())
   endfunction
 
   function! expect.never()
-    return self.__set_counter(vmock#matcher#count#never())
+    return self.__update_counter(vmock#matcher#count#never())
   endfunction
 
   " TODO test -> UAT書いているからいらないか...?
@@ -78,11 +78,10 @@ function! vmock#expect#new(funcname)
     return self.__counter
   endfunction
 
-  function! expect.__set_counter(counter)
+  function! expect.__update_counter(counter)
     if self.__counter !=# vmock#matcher#count#default()
       call vmock#exception#throw('count is already set up.')
     endif
-
     let self.__counter = a:counter
     return self
   endfunction
