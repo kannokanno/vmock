@@ -4,6 +4,7 @@ let s:save_cpo = &cpo
 set cpo&vim
 
 function! vmock#expect#new(funcname)
+  " Vim script はreturnがない関数だと0を返すので、モックの初期return値も0にしておく
   let expect = {
         \ '__return_value': 0,
         \ '__matcher': vmock#matcher#with_group#empty_instance(),
