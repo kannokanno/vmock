@@ -43,10 +43,8 @@ function! s:t.success_on_not_call()
 endfunction
 
 function! s:t.none_equal_any()
-  call vmock#mock('g:vmock_test_func').return(100)
-  call self.assert.equals(100, g:vmock_test_func())
-  call self.assert.equals(100, g:vmock_test_func())
-  call self.assert.equals(100, g:vmock_test_func())
+  let expect = vmock#mock('g:vmock_test_func').return(100)
+  call self.assert.equals(vmock#matcher#count#default(), expect.get_counter())
   call self._assert_verify_is_success()
 endfunction
 "}}}
@@ -137,6 +135,11 @@ function! s:t.success()
   call self.assert.equals(100, g:vmock_test_func())
   call self._assert_verify_is_success()
 endfunction
+
+function! s:t.exception_on_multiple_caled()
+  call self.assert.throw('VMockException:count is already set up.')
+  call vmock#mock('g:vmock_test_func').return(100).at_most(3).any()
+endfunction
 "}}}
 let s:t = s:make_test('UAT - count - at_most') "{{{
 function! s:t.success_on_not_call()
@@ -159,5 +162,22 @@ function! s:t.fail_on_more_than()
   call self.assert.equals(100, g:vmock_test_func())
   call self.assert.equals(100, g:vmock_test_func())
   call self._assert_verify_is_fail('expected: at most 3 times. but received: 4 times.')
+endfunction
+"}}}
+
+let s:t = s:make_test('UAT - count - multiple called') "{{{
+function! s:t.at_most_to_any()
+  call self.assert.throw('VMockException:count is already set up.')
+  call vmock#mock('g:vmock_test_func').return(100).at_most(3).any()
+endfunction
+
+function! s:t.times_to_never()
+  call self.assert.throw('VMockException:count is already set up.')
+  call vmock#mock('g:vmock_test_func').return(100).times(2).never()
+endfunction
+
+function! s:t.any_to_any()
+  call self.assert.throw('VMockException:count is already set up.')
+  call vmock#mock('g:vmock_test_func').return(100).any().any()
 endfunction
 "}}}

@@ -44,13 +44,6 @@ function! s:t.never()
   let expect = vmock#expect#new('g:vmock_hoge').never()
   call self.assert.equals('never', expect.get_counter().__name)
 endfunction
-
-function! s:t.resetting()
-  let expect = vmock#expect#new('g:vmock_hoge').never()
-  call self.assert.equals('never', expect.get_counter().__name)
-  call expect.any()
-  call self.assert.equals('any', expect.get_counter().__name)
-endfunction
 "}}}
 let s:t = vimtest#new('vmock#expect with()') "{{{
 
@@ -71,5 +64,10 @@ function! s:t.setting_matchers()
   call self.assert.equals(2, expect.get_matcher().__matchers_len)
   let expect = vmock#expect#new('g:vmock_hoge').with(1, 'a', {'key': 'val'})
   call self.assert.equals(3, expect.get_matcher().__matchers_len)
+endfunction
+
+function! s:t.exception_on_multiple_caled()
+  call self.assert.throw('VMockException:with is already set up.')
+  call vmock#expect#new('g:vmock_hoge').with(1).with(2)
 endfunction
 "}}}

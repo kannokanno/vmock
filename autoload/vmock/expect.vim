@@ -8,7 +8,7 @@ function! vmock#expect#new(funcname)
   let expect = {
         \ '__return_value': 0,
         \ '__matcher': vmock#matcher#with_group#empty_instance(),
-        \ '__counter': vmock#matcher#count#any(),
+        \ '__counter': vmock#matcher#count#default(),
         \ }
 
   function! expect.return(value)
@@ -17,6 +17,10 @@ function! vmock#expect#new(funcname)
   endfunction
 
   function! expect.with(...)
+    if self.__matcher !=# vmock#matcher#with_group#empty_instance()
+      call vmock#exception#throw('with is already set up.')
+    endif
+
     if a:0 ==# 0
       call vmock#exception#throw('Required args')
     endif
@@ -75,6 +79,10 @@ function! vmock#expect#new(funcname)
   endfunction
 
   function! expect.__set_counter(counter)
+    if self.__counter !=# vmock#matcher#count#default()
+      call vmock#exception#throw('count is already set up.')
+    endif
+
     let self.__counter = a:counter
     return self
   endfunction

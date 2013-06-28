@@ -77,6 +77,14 @@ function! vmock#matcher#count#at_most(expected)
   return m
 endfunction
 
+let s:default_counter = {}
+function! vmock#matcher#count#default()
+  if empty(s:default_counter)
+    let s:default_counter = vmock#matcher#count#any()
+  endif
+  return s:default_counter
+endfunction
+
 function! s:prototype(name)
   " NOTE:オブジェクトの識別子としてnameプロパティを持つがダサい
   let counter = {'__name': a:name, '__called_count': 0}
