@@ -11,7 +11,7 @@ function! vmock#mock(funcname)
   endif
   let mock = vmock#mock#new()
   let expect = mock.func(a:funcname)
-  call vmock#container#add_mock(mock)
+  call vmock#container#add_mock(a:funcname, mock)
   return expect
 endfunction
 

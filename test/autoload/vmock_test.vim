@@ -24,8 +24,15 @@ function! s:t.add_container_when_new_mock()
   call self.assert.equals(0, len(vmock#container#get_mocks()))
   call vmock#mock('g:vmock_global_func')
   call self.assert.equals(1, len(vmock#container#get_mocks()))
+endfunction
+
+function! s:t.override_on_same_funcname()
+  call self.assert.equals(0, len(vmock#container#get_mocks()))
   call vmock#mock('g:vmock_global_func')
-  call self.assert.equals(2, len(vmock#container#get_mocks()))
+  call self.assert.equals(1, len(vmock#container#get_mocks()))
+  call vmock#mock('g:vmock_global_func')
+  " TODO 上書きしたかどうかのテストができていない
+  call self.assert.equals(1, len(vmock#container#get_mocks()))
 endfunction
 "}}}
 let s:t = vimtest#new('vmock# matcher shortcurt api') "{{{
