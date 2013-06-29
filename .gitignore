@@ -1,2 +1,2 @@
 test/.vimrc
-
+autoload/vmock/autoload_tmpfile.vim

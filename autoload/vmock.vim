@@ -5,10 +5,12 @@ set cpo&vim
 
 " TODO Funcref...
 function! vmock#mock(funcname)
-  " TODO autoload
-  if !exists('*' . a:funcname)
-    call vmock#exception#throw(printf('Function not found. (%s)', a:funcname))
-  endif
+  try
+    call vmock#function_define#valiadte(a:funcname)
+  catch
+    throw v:exception
+  endtry
+
   let mock = vmock#mock#new()
   let expect = mock.func(a:funcname)
   call vmock#container#add_mock(a:funcname, mock)

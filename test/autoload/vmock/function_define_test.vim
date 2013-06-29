@@ -219,12 +219,8 @@ function! s:t.teardown()
 endfunction
 
 function! s:t.override()
-  " vmock#for_test#testdata#funcに定義あり
-  " NOTE:一度autoload関数を呼び出すか、対象ファイルをsourceしないと再定義できない
-  "      source制御は別ファイルの処理で行うので、ここのテストでは明示的に呼び出している
   call self.assert.equals(10, vmock#for_test#testdata#func())
   call vmock#function_define#override('vmock#for_test#testdata#func', [], 'return 100')
-
   call self.assert.equals(100, vmock#for_test#testdata#func())
   call self.assert.equals(join([
         \ '',

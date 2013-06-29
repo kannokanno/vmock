@@ -16,7 +16,7 @@ function! s:t.do_nothing()
 endfunction
 
 function! s:t.exeception_when_not_exists_func()
-  call self.assert.throw('VMockException:Function not found. (g:vmock_test_not_exists_func)')
+  call self.assert.throw('VMockException:E123: Undefined function: g:vmock_test_not_exists_func')
   call vmock#mock('g:vmock_test_not_exists_func')
 endfunction
 
@@ -32,6 +32,18 @@ function! s:t.override_on_same_funcname()
   call self.assert.equals(1, len(vmock#container#get_mocks()))
   call vmock#mock('g:vmock_global_func')
   " TODO 上書きしたかどうかのテストができていない
+  call self.assert.equals(1, len(vmock#container#get_mocks()))
+endfunction
+
+function! s:t.success_by_unloaded_autoload_func()
+  call self.assert.equals(0, len(vmock#container#get_mocks()))
+  call vmock#mock('vmock#for_test#autoload_testdata#func')
+  call self.assert.equals(1, len(vmock#container#get_mocks()))
+endfunction
+
+function! s:t.success_by_unloaded_autoload_func_with_arg()
+  call self.assert.equals(0, len(vmock#container#get_mocks()))
+  call vmock#mock('vmock#for_test#autoload_testdata#func_with_arg')
   call self.assert.equals(1, len(vmock#container#get_mocks()))
 endfunction
 "}}}
