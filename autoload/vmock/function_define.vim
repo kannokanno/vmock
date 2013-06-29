@@ -70,7 +70,7 @@ function! s:get_body(define_lines)
 endfunction
 
 function! vmock#function_define#override_mock(define)
-  let mock_body = vmock#function_define#build_mock_body(a:define)
+  let mock_body = vmock#function_define#make_mock_body(a:define)
   call vmock#function_define#override(a:define.funcname, a:define.arg_names, mock_body)
 endfunction
 
@@ -81,8 +81,7 @@ function! vmock#function_define#override(funcname, arg_names, body)
   execute printf("function! %s(%s)\n%s\nendfunction", a:funcname, join(a:arg_names, ','), a:body)
 endfunction
 
-" TODO rename: build -> make
-function! vmock#function_define#build_mock_body(define)
+function! vmock#function_define#make_mock_body(define)
   let called_statement = printf("call vmock#mock#called('%s', %s)",
         \ a:define.funcname, s:make_called_variable(a:define.arg_names))
   let return_statement = printf("return vmock#mock#return('%s')", a:define.funcname)

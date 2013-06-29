@@ -258,9 +258,9 @@ function! s:t.call_test()
   call vmock#function_define#override_mock({'funcname': 'g:vmock_test_func', 'arg_names': ['first']})
 endfunction
 "}}}
-let s:t = vimtest#new('vmock#function_define#build_mock_body()') "{{{
+let s:t = vimtest#new('vmock#function_define#make_mock_body()') "{{{
 
-function! s:t.build_mock_body()
+function! s:t.make_mock_body()
   let patterns = [
         \ ['g:vmock_test_func', [], '[]'],
         \ ['hoge#hoge', ['a', 'bb'], "[a:a,a:bb]"],
@@ -268,7 +268,7 @@ function! s:t.build_mock_body()
         \ ['g:dict.hoge', ['one'], "[a:one]"],
         \]
   for pat in patterns
-    let actual = vmock#function_define#build_mock_body(s:stub_define(pat[0], pat[1]))
+    let actual = vmock#function_define#make_mock_body(s:stub_define(pat[0], pat[1]))
     let expected = s:expected_statement(pat[0], pat[2])
     call self.assert.equals(expected, actual)
   endfor
