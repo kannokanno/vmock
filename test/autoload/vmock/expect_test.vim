@@ -53,7 +53,7 @@ function! s:t.default_is_empty_matcher()
 endfunction
 
 function! s:t.exception_when_empty_args()
-  call self.assert.throw('VMockException:Required args')
+  call self.assert.throw('VMock:Required args')
   let expect = vmock#expect#new('g:vmock_hoge').with()
 endfunction
 
@@ -67,7 +67,7 @@ function! s:t.setting_matchers()
 endfunction
 
 function! s:t.exception_on_multiple_caled()
-  call self.assert.throw('VMockException:with is already set up.')
+  call self.assert.throw('VMock:with is already set up.')
   call vmock#expect#new('g:vmock_hoge').with(1).with(2)
 endfunction
 "}}}

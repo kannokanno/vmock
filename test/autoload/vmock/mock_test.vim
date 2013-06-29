@@ -12,7 +12,7 @@ endfunction
 
 function! s:t.exception_when_not_global_func()
   let mock = vmock#mock#new()
-  call self.assert.throw('VMockException:There is the necessity for a global function.')
+  call self.assert.throw('VMock:There is the necessity for a global function.')
   call mock.func('s:vmock_script_func')
 endfunction
 
@@ -92,12 +92,12 @@ function! s:t.get_expect_return_value()
 endfunction
 
 function! s:t.exception_when_not_exists_function_1()
-  call self.assert.throw('VMockException:The mock(g:vmock_not_exists_func) is not registered.')
+  call self.assert.throw('VMock:The mock(g:vmock_not_exists_func) is not registered.')
   call vmock#mock#return('g:vmock_not_exists_func')
 endfunction
 
 function! s:t.exception_when_not_exists_function_2()
-  call self.assert.throw('VMockException:The mock(VmockNotExistsFunc) is not registered.')
+  call self.assert.throw('VMock:The mock(VmockNotExistsFunc) is not registered.')
   call vmock#mock#return('VmockNotExistsFunc')
 endfunction
 "}}}
@@ -120,12 +120,12 @@ function! s:t.success()
 endfunction
 
 function! s:t.exception_when_not_exists_function_1()
-  call self.assert.throw('VMockException:The mock(g:vmock_not_exists_func) is not registered.')
+  call self.assert.throw('VMock:The mock(g:vmock_not_exists_func) is not registered.')
   call vmock#mock#called('g:vmock_not_exists_func', [])
 endfunction
 
 function! s:t.exception_when_not_exists_function_2()
-  call self.assert.throw('VMockException:The mock(VmockNotExistsFunc) is not registered.')
+  call self.assert.throw('VMock:The mock(VmockNotExistsFunc) is not registered.')
   call vmock#mock#called('VmockNotExistsFunc', [])
 endfunction
 "}}}

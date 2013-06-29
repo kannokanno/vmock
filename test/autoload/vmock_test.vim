@@ -16,7 +16,7 @@ function! s:t.do_nothing()
 endfunction
 
 function! s:t.exeception_when_not_exists_func()
-  call self.assert.throw('VMockException:E123: Undefined function: g:vmock_test_not_exists_func')
+  call self.assert.throw('VMock:E123: Undefined function: g:vmock_test_not_exists_func')
   call vmock#mock('g:vmock_test_not_exists_func')
 endfunction
 

@@ -9,12 +9,12 @@ function! s:t.teardown()
 endfunction
 
 function! s:t.must_be_implement_verify()
-  call self.assert.throw('VMockException:mock obj must be implement verify()')
+  call self.assert.throw('VMock:mock obj must be implement verify()')
   call vmock#container#add_mock('VmockTestFunc', {'a': 1})
 endfunction
 
 function! s:t.must_be_verify_is_func()
-  call self.assert.throw('VMockException:verfiy must be function')
+  call self.assert.throw('VMock:verfiy must be function')
   call vmock#container#add_mock('VmockTestFunc', {'verify': 1})
 endfunction
 

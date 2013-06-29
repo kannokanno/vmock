@@ -8,7 +8,7 @@ endfunction
 let s:t = vimtest#new('vmock#matcher#with_group#make_instance()')
 
 function! s:t.arg_must_be_list()
-  call self.assert.throw('VMockException:arg type must be List')
+  call self.assert.throw('VMock:arg type must be List')
   let composite = vmock#matcher#with_group#make_instance({})
 endfunction
 
@@ -59,13 +59,13 @@ endfunction
 
 function! s:t.mismatch_arg_nums_when_too_many()
   let composite = vmock#matcher#with_group#make_instance([1, 'AA'])
-  call self.assert.throw('VMockException:expected 2 args, but 3 args were passed.')
+  call self.assert.throw('VMock:expected 2 args, but 3 args were passed.')
   call self.assert.true(composite.match([1, 2, 3]))
 endfunction
 
 function! s:t.mismatch_arg_nums_when_not_enough()
   let composite = vmock#matcher#with_group#make_instance([1, 'AA'])
-  call self.assert.throw('VMockException:expected 2 args, but 1 args were passed.')
+  call self.assert.throw('VMock:expected 2 args, but 1 args were passed.')
   call self.assert.true(composite.match([1]))
 endfunction
 

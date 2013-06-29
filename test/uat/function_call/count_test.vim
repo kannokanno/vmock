@@ -137,7 +137,7 @@ function! s:t.success()
 endfunction
 
 function! s:t.exception_on_multiple_caled()
-  call self.assert.throw('VMockException:count is already set up.')
+  call self.assert.throw('VMock:count is already set up.')
   call vmock#mock('g:vmock_test_func').return(100).at_most(3).any()
 endfunction
 "}}}
@@ -167,17 +167,17 @@ endfunction
 
 let s:t = s:make_test('UAT - count - multiple called') "{{{
 function! s:t.at_most_to_any()
-  call self.assert.throw('VMockException:count is already set up.')
+  call self.assert.throw('VMock:count is already set up.')
   call vmock#mock('g:vmock_test_func').return(100).at_most(3).any()
 endfunction
 
 function! s:t.times_to_never()
-  call self.assert.throw('VMockException:count is already set up.')
+  call self.assert.throw('VMock:count is already set up.')
   call vmock#mock('g:vmock_test_func').return(100).times(2).never()
 endfunction
 
 function! s:t.any_to_any()
-  call self.assert.throw('VMockException:count is already set up.')
+  call self.assert.throw('VMock:count is already set up.')
   call vmock#mock('g:vmock_test_func').return(100).any().any()
 endfunction
 "}}}
