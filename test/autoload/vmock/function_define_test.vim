@@ -52,7 +52,7 @@ function! s:t.one_line_body()
   let define = vmock#function_define#get('g:vmock_global_func')
   call self.assert.equals('g:vmock_global_func', define.funcname)
   call self.assert.equals(join([
-        \ '    return s:hogehoge()',
+        \ 'return s:hogehoge()',
         \ ], "\n"), define.body)
 endfunction
 
@@ -68,12 +68,12 @@ function! s:t.multi_line_body()
   let define = vmock#function_define#get('g:vmock_global_func')
   call self.assert.equals('g:vmock_global_func', define.funcname)
   call self.assert.equals(join([
-        \ "    let a = 1",
-        \ "    let b = 2",
-        \ "    if a ==# b",
-        \ "      return 'hoge'",
-        \ "    endif",
-        \ "    return 'piyo'"
+        \ "let a = 1",
+        \ "let b = 2",
+        \ "if a ==# b",
+        \ "return 'hoge'",
+        \ "endif",
+        \ "return 'piyo'"
         \ ], "\n"), define.body)
 endfunction
 
@@ -81,18 +81,39 @@ function! s:t.multi_line_and_no_return_body()
   function! g:vmock_global_func(arg)
     let a = 1
     let b = 2
+    let b = 2
+    let b = 2
+    let b = 2
+    let b = 2
+    let b = 2
+    let b = 2
+    let b = 2
+    let b = 2
+    let b = 2
+    let b = 2
     if a ==# b
       echo 'OK!'
     endif
   endfunction
   let define = vmock#function_define#get('g:vmock_global_func')
   call self.assert.equals('g:vmock_global_func', define.funcname)
+  " 行番号の桁数によってインデントがずれてしまう
   call self.assert.equals(join([
-        \ "    let a = 1",
-        \ "    let b = 2",
-        \ "    if a ==# b",
-        \ "      echo 'OK!'",
-        \ "    endif",
+        \ "let a = 1",
+        \ "let b = 2",
+        \ "let b = 2",
+        \ "let b = 2",
+        \ "let b = 2",
+        \ "let b = 2",
+        \ "let b = 2",
+        \ "let b = 2",
+        \ "let b = 2",
+        \ "let b = 2",
+        \ "let b = 2",
+        \ "let b = 2",
+        \ "if a ==# b",
+        \ "echo 'OK!'",
+        \ "endif",
         \ ], "\n"), define.body)
 endfunction
 "}}}
