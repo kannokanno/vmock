@@ -40,7 +40,7 @@ function! s:test()
     call s:assert(items[1], feeds[1])
     call s:assert(items[2], feeds[2])
 
-    call vmock#verify_print()
+    call vmock#verify()
   finally
     call vmock#container#clear()
   endtry

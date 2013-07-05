@@ -17,20 +17,13 @@ function! vmock#mock(funcname)
   return expect
 endfunction
 
-" TODO test
-function! vmock#verify_print()
-  let success = 1
+function! vmock#verify()
   for mock in vmock#container#get_mocks()
     let result = mock.verify()
     if result.is_fail
-      " TODO messageもうちょっと整形
-      echo 'NG => ' . result.message
-      let success = 0
+      call vmock#exception#throw(result.message)
     endif
   endfor
-  if success
-    echo 'OK.'
-  endif
 endfunction
 
 " matcher shortcurt api's"{{{

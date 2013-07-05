@@ -24,7 +24,7 @@ function! s:test_windows()
     " TODO vmock#mockのFuncref対応待ち
     call vmock#mock(g:vmock_example_vital_prelude.is_windows).return(1).once()
     call s:assert(VMockExampleVitalOSString(), 'Hello Windows')
-    call vmock#verify_print()
+    call vmock#verify()
   finally
     call vmock#container#clear()
   endtry
