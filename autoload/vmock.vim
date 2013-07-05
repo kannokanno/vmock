@@ -18,12 +18,31 @@ function! vmock#mock(funcname)
 endfunction
 
 function! vmock#verify()
+  let event = {'_test': self}
+
+  function! event.on_success()
+    " nothing
+  endfunction
+
+  function! event.on_failure(message)
+    call vmock#exception#throw(a:message)
+  endfunction
+  call vmock#verify_with_event(event)
+endfunction
+
+function! vmock#verify_with_event(event)
+  let success = 1
   for mock in vmock#container#get_mocks()
     let result = mock.verify()
     if result.is_fail
-      call vmock#exception#throw(result.message)
+      let success = 0
+      call a:event.on_failure(result.message)
     endif
   endfor
+
+  if success
+    call a:event.on_success()
+  endif
 endfunction
 
 " matcher shortcurt api's"{{{

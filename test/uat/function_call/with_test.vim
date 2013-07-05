@@ -22,24 +22,31 @@ function! s:make_test(name) "{{{
   endfunction
 
   function! t._assert_verify_is_success()
-    for mock in vmock#container#get_mocks()
-      let result = mock.verify()
-      if result.is_fail
-        call self.assert.fail(result.message)
-      endif
-    endfor
-    call self.assert.success()
+    let event = {'_test': self}
+
+    function! event.on_success()
+      call self._test.assert.success()
+    endfunction
+
+    function! event.on_failure(message)
+      call self._test.assert.fail(a:message)
+    endfunction
+
+    call vmock#verify_with_event(event)
   endfunction
 
   function! t._assert_verify_is_fail(expected)
-    for mock in vmock#container#get_mocks()
-      let result = mock.verify()
-      if result.is_fail
-        call self.assert.equals(a:expected, result.message)
-        return
-      endif
-    endfor
-    call self.assert.fail('Expected failed but success')
+    let event = {'_test': self, '_expected': a:expected}
+
+    function! event.on_success()
+      call self._test.assert.fail('Expected failed but success')
+    endfunction
+
+    function! event.on_failure(message)
+      call self._test.assert.equals(self._expected, a:message)
+    endfunction
+
+    call vmock#verify_with_event(event)
   endfunction
 
   return t
