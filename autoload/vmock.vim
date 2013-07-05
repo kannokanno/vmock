@@ -3,23 +3,30 @@
 let s:save_cpo = &cpo
 set cpo&vim
 
-" TODO Funcref...
-function! vmock#mock(funcname)
+function! vmock#mock(func)
   try
-    call vmock#function_define#valiadte(a:funcname)
+    let funcname = s:convert_funcref_to_funcname(a:func)
+    call vmock#function_define#validate(funcname)
   catch
     throw v:exception
   endtry
 
   let mock = vmock#mock#new()
-  let expect = mock.func(a:funcname)
-  call vmock#container#add_mock(a:funcname, mock)
+  let expect = mock.func(funcname)
+  call vmock#container#add_mock(funcname, mock)
   return expect
 endfunction
 
-function! vmock#verify()
-  let event = {'_test': self}
+" TODO function_defineに移動?
+function! s:convert_funcref_to_funcname(func)
+  if type(a:func) !=# type('tr')
+    return substitute(string(a:func), "function('\\(.*\\)')", '\1', '')
+  endif
+  return a:func
+endfunction
 
+function! vmock#verify()
+  let event = {}
   function! event.on_success()
     " nothing
   endfunction

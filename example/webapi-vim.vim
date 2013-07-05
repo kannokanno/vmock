@@ -41,6 +41,8 @@ function! s:test()
     call s:assert(items[2], feeds[2])
 
     call vmock#verify()
+  catch
+    echoerr v:exception
   finally
     call vmock#container#clear()
   endtry

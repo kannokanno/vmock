@@ -20,12 +20,11 @@ endfunction
 
 let s:autoload_tmpfile = expand('<sfile>:p:h') . '/autoload_tmpfile.vim'
 " TODO test
-function! vmock#function_define#valiadte(funcname)
+function! vmock#function_define#validate(funcname)
   let ok = 1
   if exists('*'.a:funcname)
     return ok
   endif
-
   " 辞書関数
   if exists(a:funcname) && (type(a:funcname) ==# type('tr'))
     return ok
