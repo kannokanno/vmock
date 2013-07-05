@@ -19,26 +19,36 @@ function! vmock#function_define#get(funcname)
 endfunction
 
 let s:autoload_tmpfile = expand('<sfile>:p:h') . '/autoload_tmpfile.vim'
+" TODO test
 function! vmock#function_define#valiadte(funcname)
+  let ok = 1
   if exists('*'.a:funcname)
-    " OK
-    return 1
+    return ok
   endif
-  try
-    " TODO vim-jp/issues
-    " function a#foo だとautoload関数はロードされるが
-    " exe 'function a#foo' だとロードがされないので、
-    " 仕方なくファイルに"function funcname"を書きだしてsourceしている
-    call writefile(['silent! function ' . a:funcname], s:autoload_tmpfile)
-    execute 'silent source ' . s:autoload_tmpfile
-  catch /.*/
-    " 存在しないautoload関数だった場合など
-    call vmock#exception#throw(v:exception)
-  endtry
-  " 再チャレンジ。初回でautoloadが未ロードだった場合のみ成功する
-  if exists('*'.a:funcname)
-    return 1
+
+  " 辞書関数
+  if exists(a:funcname) && (type(a:funcname) ==# type('tr'))
+    return ok
   endif
+
+  if stridx(a:funcname, '#') !=# -1
+    try
+      " TODO vim-jp/issues
+      " function a#foo だとautoload関数はロードされるが
+      " exe 'function a#foo' だとロードがされないので、
+      " 仕方なくファイルに"function funcname"を書きだしてsourceしている
+      call writefile(['silent! function ' . a:funcname], s:autoload_tmpfile)
+      execute 'silent source ' . s:autoload_tmpfile
+    catch /.*/
+      " 存在しないautoload関数だった場合など
+      call vmock#exception#throw(v:exception)
+    endtry
+    " 再チャレンジ。初回でautoloadが未ロードだった場合のみ成功する
+    if exists('*'.a:funcname)
+      return ok
+    endif
+  endif
+
   call vmock#exception#throw(printf('E123: Undefined function: %s', a:funcname))
 endfunction
 
