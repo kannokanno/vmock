@@ -327,7 +327,7 @@ function! s:t.success_when_autoload()
 endfunction
 
 function! s:t.exception_when_not_func()
-  call self.assert.throw('Vim(if):E129: Function name required')
+  call self.assert.throw('E129')
   call vmock#function_define#validate('$VIM')
 endfunction
 

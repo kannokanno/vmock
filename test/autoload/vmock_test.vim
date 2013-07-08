@@ -12,7 +12,8 @@ function! s:t.teardown()
 endfunction
 
 function! s:t.do_nothing()
-  let mock = vmock#mock('g:vmock_test_func')
+  let mock = vmock#mock('g:vmock_global_func')
+  call self.assert.success()
 endfunction
 
 function! s:t.exeception_when_not_exists_func()
