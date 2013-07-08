@@ -12,6 +12,9 @@ endfunction
 function! vmock#for_test#testdata#func()
   return 10
 endfunction
+function! vmock#for_test#testdata#for_validate()
+  return 20
+endfunction
 "}}}
 " for autoload_func_test.vim "{{{
 function! vmock#for_test#testdata#func_no_args()

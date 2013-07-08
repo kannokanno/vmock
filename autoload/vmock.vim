@@ -85,9 +85,14 @@ function! vmock#has(expected)
   return vmock#matcher#with#has(a:expected)
 endfunction
 
+function! vmock#not_has(expected)
+  return vmock#matcher#with#not_has(a:expected)
+endfunction
+
 function! vmock#custom(expected)
   return vmock#matcher#with#custom(a:expected)
 endfunction
 "}}}
+
 let &cpo = s:save_cpo
 unlet s:save_cpo

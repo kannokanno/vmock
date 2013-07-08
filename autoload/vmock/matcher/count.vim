@@ -3,8 +3,6 @@
 let s:save_cpo = &cpo
 set cpo&vim
 
-" TODO make_fail_message test -> UAT書いているからいらないか...?
-
 function! vmock#matcher#count#once()
   let m = s:prototype('once')
   let m.__expected_count = 1

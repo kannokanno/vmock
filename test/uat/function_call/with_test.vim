@@ -88,6 +88,26 @@ function! s:t.fail_second_arg()
   call self._assert_verify_is_fail('The args[1] expected: type({}). but received: type([]).')
 endfunction
 "}}}
+let s:t = s:make_test('UAT - with - not_type') "{{{
+
+function! s:t.success()
+  call vmock#mock('g:vmock_test_func_two_args').with(vmock#not_type(1), vmock#not_type({}))
+  call g:vmock_test_func_two_args('aa', [1])
+  call self._assert_verify_is_success()
+endfunction
+
+function! s:t.fail_first_arg()
+  call vmock#mock('g:vmock_test_func_two_args').with(vmock#not_type(1), vmock#not_type({}))
+  call g:vmock_test_func_two_args(10, [1])
+  call self._assert_verify_is_fail('The args[0] expected: except type(0). but received: type(0).')
+endfunction
+
+function! s:t.fail_second_arg()
+  call vmock#mock('g:vmock_test_func_two_args').with(vmock#not_type(1), vmock#not_type({}))
+  call g:vmock_test_func_two_args('a', {'a': 1})
+  call self._assert_verify_is_fail('The args[1] expected: except type({}). but received: type({}).')
+endfunction
+"}}}
 let s:t = s:make_test('UAT - with - eq') "{{{
 
 function! s:t.success()
@@ -113,7 +133,7 @@ endfunction
 function! s:t.fail()
   call vmock#mock('g:vmock_test_func_two_args').with(vmock#not_eq('hoge'), vmock#not_eq([1, 2]))
   call g:vmock_test_func_two_args('hoge', [2, 1])
-  call self._assert_verify_is_fail("The args[0] expected not equal(==#) 'hoge'. but received: 'hoge'.")
+  call self._assert_verify_is_fail("The args[0] expected: not equal(==#) 'hoge'. but received: 'hoge'.")
 endfunction
 "}}}
 let s:t = s:make_test('UAT - with - loose_eq') "{{{
@@ -147,6 +167,56 @@ endfunction
 function! s:t.fail()
   call vmock#mock('g:vmock_test_func_one_args').with(vmock#loose_not_eq('hoge'))
   call g:vmock_test_func_one_args('hoge')
-  call self._assert_verify_is_fail("The args[0] expected not equal(==) 'hoge'. but received: 'hoge'.")
+  call self._assert_verify_is_fail("The args[0] expected: not equal(==) 'hoge'. but received: 'hoge'.")
+endfunction
+"}}}
+let s:t = s:make_test('UAT - with - has') "{{{
+
+function! s:t.success()
+  call vmock#mock('g:vmock_test_func_one_args').with(vmock#has('bar'))
+  call g:vmock_test_func_one_args(['foo', 'bar'])
+  call self._assert_verify_is_success()
+endfunction
+
+function! s:t.fail()
+  call vmock#mock('g:vmock_test_func_one_args').with(vmock#has('baz'))
+  call g:vmock_test_func_one_args(['foo', 'bar'])
+  call self._assert_verify_is_fail("The args[0] expected: has('baz'). but not found.")
+endfunction
+"}}}
+let s:t = s:make_test('UAT - with - not_has') "{{{
+
+function! s:t.success()
+  call vmock#mock('g:vmock_test_func_one_args').with(vmock#not_has('baz'))
+  call g:vmock_test_func_one_args(['foo', 'bar'])
+  call self._assert_verify_is_success()
+endfunction
+
+function! s:t.fail()
+  call vmock#mock('g:vmock_test_func_one_args').with(vmock#not_has('bar'))
+  call g:vmock_test_func_one_args(['foo', 'bar'])
+  call self._assert_verify_is_fail("The args[0] expected: has not('bar'). but found.")
+endfunction
+"}}}
+let s:t = s:make_test('UAT - with - custom') "{{{
+
+function! s:t.success()
+  function! VMockCustomMatcher(arg)
+    return len(a:arg) ==# 2
+  endfunction
+
+  call vmock#mock('g:vmock_test_func_one_args').with(vmock#custom('VMockCustomMatcher'))
+  call g:vmock_test_func_one_args(['foo', 'bar'])
+  call self._assert_verify_is_success()
+endfunction
+
+function! s:t.fail()
+  function! VMockCustomMatcher(arg)
+    return len(a:arg) ==# 2
+  endfunction
+
+  call vmock#mock('g:vmock_test_func_one_args').with(vmock#custom('VMockCustomMatcher'))
+  call g:vmock_test_func_one_args(['foo'])
+  call self._assert_verify_is_fail("Failed custom matcher. The args[0] match function: VMockCustomMatcher, args: ['foo']")
 endfunction
 "}}}

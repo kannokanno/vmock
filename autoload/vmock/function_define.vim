@@ -19,20 +19,18 @@ function! vmock#function_define#get(funcname)
 endfunction
 
 let s:autoload_tmpfile = expand('<sfile>:p:h') . '/autoload_tmpfile.vim'
-" TODO test
 function! vmock#function_define#validate(funcname)
-  let ok = 1
+  let success = 1
   if exists('*'.a:funcname)
-    return ok
+    return success
   endif
   " 辞書関数
   if exists(a:funcname) && (type(a:funcname) ==# type('tr'))
-    return ok
+    return success
   endif
 
   if stridx(a:funcname, '#') !=# -1
     try
-      " TODO vim-jp/issues
       " function a#foo だとautoload関数はロードされるが
       " exe 'function a#foo' だとロードがされないので、
       " 仕方なくファイルに"function funcname"を書きだしてsourceしている
@@ -44,7 +42,7 @@ function! vmock#function_define#validate(funcname)
     endtry
     " 再チャレンジ。初回でautoloadが未ロードだった場合のみ成功する
     if exists('*'.a:funcname)
-      return ok
+      return success
     endif
   endif
 

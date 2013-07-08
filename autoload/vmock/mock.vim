@@ -24,12 +24,10 @@ function! vmock#mock#new()
     let expect = vmock#expect#new(a:funcname)
     let self.__expect = expect
 
-    " TODO expects というよりmocks?でもそれならcontainarが...
     let s:expects[a:funcname] = expect
     return expect
   endfunction
 
-  " TODO 単なる委譲...
   function! mock.verify()
     return self.__expect.verify()
   endfunction

@@ -52,7 +52,6 @@ function! vmock#expect#new(funcname)
     return self.__update_counter(vmock#matcher#count#never())
   endfunction
 
-  " TODO test -> UAT書いているからいらないか...?
   function! expect.verify()
     let counter = self.get_counter()
     if !counter.validate()

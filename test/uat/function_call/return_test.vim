@@ -28,7 +28,7 @@ function! s:t.override_value_even_if_no_return_statement()
   call self.assert.equals(100, g:vmock_test_func())
 endfunction
 
-" return指定がなければ結果は0になる TODO => それは微妙
+" return指定がなければ結果は0になる
 function! s:t.default_return_value_is_0()
   function! g:vmock_test_func()
     return 10

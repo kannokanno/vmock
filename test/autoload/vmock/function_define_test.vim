@@ -1,4 +1,4 @@
-" TODO 細かいパターンは受け入れに回すということをここにも明記しておくか
+" 細かいパターンはUAT側でカバーしている
 let s:t = vimtest#new('vmock#function_define#get() - g:func') "{{{
 
 function! s:t.teardown()
@@ -304,6 +304,36 @@ function! s:expected_statement(funcname, arg_variable)
   let s .= "\n"
   let s .= printf("return vmock#mock#return('%s')", a:funcname)
   return s
+endfunction
+"}}}
+let s:t = vimtest#new('vmock#function_define#validate()') "{{{
+
+function! s:t.success_when_exists_func()
+  call self.assert.true(vmock#function_define#validate('tr'))
+endfunction
+
+function! s:t.success_when_exists_dict_func()
+  let g:vmock_test_dict = {}
+  function! g:vmock_test_dict.something()
+  endfunction
+
+  call self.assert.true(vmock#function_define#validate('g:vmock_test_dict.something'))
+
+  unlet g:vmock_test_dict
+endfunction
+
+function! s:t.success_when_autoload()
+  call self.assert.true(vmock#function_define#validate('vmock#for_test#testdata#for_validate'))
+endfunction
+
+function! s:t.exception_when_not_func()
+  call self.assert.throw('Vim(if):E129: Function name required')
+  call vmock#function_define#validate('$VIM')
+endfunction
+
+function! s:t.exception_when_undefined_func()
+  call self.assert.throw('VMock:E123: Undefined function: VMockUndeinfedFunc')
+  call vmock#function_define#validate('VMockUndeinfedFunc')
 endfunction
 "}}}
 

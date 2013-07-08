@@ -23,9 +23,8 @@ function! vmock#matcher#with_group#make_instance(matchers)
   " 必ず各引数を配列にした形で受け取る([] | [arg1, arg2 ...])
   function! obj.match(args)
     if len(a:args) !=# self.__matchers_len
-      let msg = printf('expected %d args, but %d args were passed.', self.__matchers_len, len(a:args))
-      " TODO 例外じゃなくて失敗扱いだな(testも)
-      call vmock#exception#throw(msg)
+      let self.__fail_message = printf('expected %d args, but %d args were passed.', self.__matchers_len, len(a:args))
+      return 0
     endif
 
     for i in range(self.__matchers_len)

@@ -9,7 +9,7 @@ let s:t = vimtest#new('vmock#matcher#with_group#make_instance()')
 
 function! s:t.arg_must_be_list()
   call self.assert.throw('VMock:arg type must be List')
-  let composite = vmock#matcher#with_group#make_instance({})
+  let group = vmock#matcher#with_group#make_instance({})
 endfunction
 
 " match関数が定義されていればそのまま保持する
@@ -18,8 +18,8 @@ function! s:t.when_arg_is_match_obj()
   function! matcher_stub.match(args)
   endfunction
 
-  let composite = vmock#matcher#with_group#make_instance([matcher_stub])
-  let matchers = composite.get_matchers()
+  let group = vmock#matcher#with_group#make_instance([matcher_stub])
+  let matchers = group.get_matchers()
   call self.assert.equals(1, len(matchers))
   call self.assert.equals('stub', matchers[0].name)
 endfunction
@@ -27,8 +27,8 @@ endfunction
 " match関数が定義されていなければeq_matcherにラップして保持する
 function! s:t.when_arg_is_not_match_obj()
   for arg in [1, 'aa', [1, 2, 'b'], {'a': 1}]
-    let composite = vmock#matcher#with_group#make_instance([arg])
-    let matchers = composite.get_matchers()
+    let group = vmock#matcher#with_group#make_instance([arg])
+    let matchers = group.get_matchers()
     call self.assert.equals(1, len(matchers))
     " TODO 厳密にeq_matcherかどうかはテストできていない
     call self.assert.equals(arg, matchers[0].__expected)
@@ -41,8 +41,8 @@ function! s:t.multiple_args()
   function! matcher_stub.match(args)
   endfunction
 
-  let composite = vmock#matcher#with_group#make_instance([1, matcher_stub, ['b']])
-  let matchers = composite.get_matchers()
+  let group = vmock#matcher#with_group#make_instance([1, matcher_stub, ['b']])
+  let matchers = group.get_matchers()
   call self.assert.equals(3, len(matchers))
   call self.assert.equals(1, matchers[0].__expected)
   call self.assert.equals('stub', matchers[1].name)
@@ -52,32 +52,33 @@ endfunction
 let s:t = vimtest#new('vmock#matcher#with_group#match()')
 
 function! s:t.empty_obj_match_is_always_success()
-  let matcher = vmock#matcher#with_group#empty_instance()
-  call self.assert.true(matcher.match([1]))
-  call self.assert.true(matcher.match([1, 2]))
+  let group = vmock#matcher#with_group#empty_instance()
+  call self.assert.true(group.match([1]))
+  call self.assert.true(group.match([1, 2]))
+  call self.assert.equals('', group.__fail_message)
 endfunction
 
 function! s:t.mismatch_arg_nums_when_too_many()
-  let composite = vmock#matcher#with_group#make_instance([1, 'AA'])
-  call self.assert.throw('VMock:expected 2 args, but 3 args were passed.')
-  call self.assert.true(composite.match([1, 2, 3]))
+  let group = vmock#matcher#with_group#make_instance([1, 'AA'])
+  call self.assert.false(group.match([1, 2, 3]))
+  call self.assert.equals('expected 2 args, but 3 args were passed.', group.__fail_message)
 endfunction
 
 function! s:t.mismatch_arg_nums_when_not_enough()
-  let composite = vmock#matcher#with_group#make_instance([1, 'AA'])
-  call self.assert.throw('VMock:expected 2 args, but 1 args were passed.')
-  call self.assert.true(composite.match([1]))
+  let group = vmock#matcher#with_group#make_instance([1, 'AA'])
+  call self.assert.false(group.match([1]))
+  call self.assert.equals('expected 2 args, but 1 args were passed.', group.__fail_message)
 endfunction
 
 function! s:t.called_each_obj_match()
-  let composite = vmock#matcher#with_group#make_instance([
+  let group = vmock#matcher#with_group#make_instance([
         \ s:make_stub(10),
         \ s:make_stub(20),
         \ s:make_stub(30)])
-  call composite.match([10, 20, 30])
+  call group.match([10, 20, 30])
 
   " matchに成功したのでカウントアップされていることを確認する
-  let matchers = composite.get_matchers()
+  let matchers = group.get_matchers()
   call self.assert.equals(11, matchers[0].num)
   call self.assert.equals(21, matchers[1].num)
   call self.assert.equals(31, matchers[2].num)
