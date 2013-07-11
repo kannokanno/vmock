@@ -20,6 +20,7 @@ endfunction
 " TODO function_defineに移動?
 function! s:convert_funcref_to_funcname(func)
   if type(a:func) !=# type('tr')
+    " funcrefはstring()にかけると function('tr') という文字列になる
     return substitute(string(a:func), "function('\\(.*\\)')", '\1', '')
   endif
   return a:func

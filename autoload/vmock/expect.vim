@@ -3,8 +3,17 @@
 let s:save_cpo = &cpo
 set cpo&vim
 
+" ---
+" <funcname>のモック検証用オブジェクトを生成します。
+"
+" @funcname 関数名
+"
+" Return
+"   検証用オブジェクト
+" ---
 function! vmock#expect#new(funcname)
   " Vim script はreturnがない関数だと0を返すので、モックの初期return値も0にしておく
+  " TODO 初期値を表すオブジェクトがempty_instanceとdefaultになっていて名前が統一されていない
   let expect = {
         \ '__return_value': 0,
         \ '__matcher': vmock#matcher#with_group#empty_instance(),
@@ -88,15 +97,25 @@ function! vmock#expect#new(funcname)
   return expect
 endfunction
 
+" ---
+" verify結果を生成します。
+"
+" @is_success verify成功なら1、失敗ならそれ以外(0を推奨)
+" @message verify結果メッセージ
+"
+" Return
+"   以下の内容を持つ辞書
+"     is_fail: verify失敗なら1、成功なら0
+"     message: verify結果メッセージ
+" ---
 function! s:make_verify_result(is_success, message)
-  let result = {'is_fail': a:is_success !=# 1, 'message': a:message}
-  return result
+  return {'is_fail': a:is_success !=# 1, 'message': a:message}
 endfunction
 
+" verifyの失敗結果を生成する
 function! s:make_verify_fail_result(matcher)
   return s:make_verify_result(0, a:matcher.make_fail_message())
 endfunction
 
 let &cpo = s:save_cpo
 unlet s:save_cpo
-

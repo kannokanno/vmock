@@ -3,11 +3,18 @@
 let s:save_cpo = &cpo
 set cpo&vim
 
+" モックのフックや元関数の復元などで参照するために
+" スクリプトローカルスコープに保存する必要がある
 let s:mock_container = {}
 
-" 1テストケース単位を想定
-" なのでget_mocksは関数名をもらわずすべて返している
-
+" ---
+" <funcname>に対応する<mock>を追加します。
+"
+" @funcname 関数名
+" @funcname モックオブジェクト
+"
+" Return なし
+" ---
 function! vmock#container#add_mock(funcname, mock)
   if !has_key(a:mock, 'verify')
     call vmock#exception#throw('mock obj must be implement verify()')

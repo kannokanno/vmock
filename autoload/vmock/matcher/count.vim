@@ -3,8 +3,10 @@
 let s:save_cpo = &cpo
 set cpo&vim
 
+" 各matcherの詳細はヘルプを参照してください。
+
 function! vmock#matcher#count#once()
-  let m = s:prototype('once')
+  let m = s:make_prototype('once')
   let m.__expected_count = 1
   function! m.validate()
     return self.__called_count ==# self.__expected_count
@@ -17,7 +19,7 @@ function! vmock#matcher#count#once()
 endfunction
 
 function! vmock#matcher#count#times(expected)
-  let m = s:prototype('times')
+  let m = s:make_prototype('times')
   let m.__expected_count = a:expected
   function! m.validate()
     return self.__called_count ==# self.__expected_count
@@ -30,7 +32,7 @@ function! vmock#matcher#count#times(expected)
 endfunction
 
 function! vmock#matcher#count#any()
-  let m = s:prototype('any')
+  let m = s:make_prototype('any')
   function! m.validate()
     return 1 == 1
   endfunction
@@ -38,7 +40,7 @@ function! vmock#matcher#count#any()
 endfunction
 
 function! vmock#matcher#count#never()
-  let m = s:prototype('never')
+  let m = s:make_prototype('never')
   function! m.validate()
     return self.__called_count < 1
   endfunction
@@ -50,7 +52,7 @@ function! vmock#matcher#count#never()
 endfunction
 
 function! vmock#matcher#count#at_least(expected)
-  let m = s:prototype('at_least')
+  let m = s:make_prototype('at_least')
   let m.__expected_count = a:expected
   function! m.validate()
     return self.__expected_count <= self.__called_count
@@ -63,7 +65,7 @@ function! vmock#matcher#count#at_least(expected)
 endfunction
 
 function! vmock#matcher#count#at_most(expected)
-  let m = s:prototype('at_most')
+  let m = s:make_prototype('at_most')
   let m.__expected_count = a:expected
   function! m.validate()
     return self.__called_count <= self.__expected_count
@@ -75,6 +77,7 @@ function! vmock#matcher#count#at_most(expected)
   return m
 endfunction
 
+" s:default_counter is singleton
 let s:default_counter = {}
 function! vmock#matcher#count#default()
   if empty(s:default_counter)
@@ -83,8 +86,8 @@ function! vmock#matcher#count#default()
   return s:default_counter
 endfunction
 
-function! s:prototype(name)
-  " NOTE:オブジェクトの識別子としてnameプロパティを持つがダサい
+function! s:make_prototype(name)
+  " オブジェクトの識別子としてnameプロパティを持っているがダサい
   let counter = {'__name': a:name, '__called_count': 0}
 
   function! counter.called()
