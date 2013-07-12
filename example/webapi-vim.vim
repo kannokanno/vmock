@@ -44,7 +44,7 @@ function! s:test()
   catch
     echoerr v:exception
   finally
-    call vmock#container#clear()
+    call vmock#clear()
   endtry
 endfunction
 "}}}

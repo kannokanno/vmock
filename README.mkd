@@ -1,0 +1,146 @@
+# VMock
+
+Vim scriptテスト用のモックライブラリです。
+
+次のような記述で使用します。
+
+```vim
+call vmock#mock('SomeGlobalFunc').with(arg1, arg2).return(items).once()
+```
+
+## 依存
+
+必須なものはありません。
+
+## 連携できるテストフレームワーク
+
+現時点では何もありませんが、[kannokanno/vimtest](https://github.com/kannokanno/vimtest)に対応予定です。
+
+## 使い方
+
+### モック作成
+
+関数名かFuncrefを指定することで対象のモックを作成します。  
+
+__グローバル関数__
+
+```vim
+let mock = vmock#mock('SomeGlobalFunc')
+```
+
+__autoload関数__
+
+```vim
+let mock = vmock#mock('some_plugin#func')
+```
+
+__辞書関数__
+
+```vim
+let mock = vmock#mock('g:some_dict.func')
+```
+
+__Funcref__
+
+```vim
+let mock = vmock#mock(function('SomeGlobalFunc'))
+```
+
+__スクリプトローカルな関数__
+
+スクリプトローカルな関数はモック化できません。
+
+### 戻り値の指定
+
+モックの `return()` を使うことにより戻り値の指定ができます。
+
+```vim
+call vmock#mock('SomeGlobalFunc').return(100)
+```
+
+or
+
+```vim
+let mock = vmock#mock('SomeGlobalFunc')
+call mock.return(100)
+```
+
+### 引数の検証
+
+モックの `with()` を使うことにより引数の検証ができます。
+
+```vim
+call vmock#mock('SomeGlobalFunc').with('SomeArg')
+```
+
+or
+
+```vim
+let mock = vmock#mock('SomeGlobalFunc')
+call mock.with('SomeArg')
+```
+
+値を直接指定した場合は `==#` による検証が行われます。
+
+その他の引数Matcherについてはヘルプを参照してください。
+
+### 呼び出し回数の検証
+
+特定のモックAPIを使うことにより呼び出し回数の検証ができます。
+
+```vim
+call vmock#mock('SomeGlobalFunc').once()
+```
+
+or
+
+```vim
+let mock = vmock#mock('SomeGlobalFunc')
+call mock.once()
+```
+
+その他の回数Matcherについてはヘルプを参照してください。
+
+### 単体でVMockを使う場合
+
+本来は他のテストプラグインと連携して使うことを目的としていますが、VMock単体でも利用可能です。
+
+単体で使う場合は以下の条件を守る必要があります。
+
+* モック検証のために `call vmock#verify()` を記述する
+* モック作成 ~ 検証までをtry文で囲う
+* finally句で `call vmock#clear()` を記述する
+    * clear()を呼ばないと元の関数定義を復元出来ません
+
+以下は[mattn/webapi-vim](https://github.com/mattn/webapi-vim)に対するモックの例です。  
+なお、このコードの全体は `vmock/example/webapi-vim` にあります。
+
+```vim
+" expected data
+let items = [s:make_item('Title-1', 'http://localhost/hoge'),
+          \ s:make_item('Title-2', 'http://localhost/piyo'),
+          \ s:make_item('Title-3', 'http://localhost/fuga')]
+let url = 'http://rss.slashdot.org/Slashdot/slashdot'
+
+try
+  call vmock#mock('webapi#feed#parseURL').with(url).return(items).once()
+
+  let feeds = s:read_feed(url)
+
+  call s:assert(len(items), len(feeds))
+  call s:assert(items[0], feeds[0])
+  call s:assert(items[1], feeds[1])
+  call s:assert(items[2], feeds[2])
+
+  call vmock#verify()
+catch
+  echoerr v:exception
+finally
+  call vmock#clear()
+endtry
+```
+
+### その他
+
+詳細はヘルプを参照してください。
+

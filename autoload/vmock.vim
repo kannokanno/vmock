@@ -53,6 +53,10 @@ function! vmock#verify_with_event(event)
   endif
 endfunction
 
+function! vmock#clear()
+  return vmock#container#clear()
+endfunction
+
 " matcher shortcurt api's"{{{
 function! vmock#any()
   return vmock#matcher#with#any()
