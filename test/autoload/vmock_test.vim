@@ -8,7 +8,7 @@ endfunction
 
 function! s:t.teardown()
   delfunction g:vmock_global_func
-  call vmock#container#clear()
+  call vmock#clear()
 endfunction
 
 function! s:t.do_nothing()

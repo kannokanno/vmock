@@ -2,7 +2,7 @@ function! s:make_test(name) "{{{
   let t = vimtest#new(a:name)
 
   function! t.setup()
-    call vmock#container#clear()
+    call vmock#clear()
 
     function! g:vmock_test_func_no_args()
     endfunction
