@@ -1,0 +1,603 @@
+*vmock.txt*	Vim script用モックライブラリ
+
+Version: 1.0
+Author: kanno <akapanna@gmail.com>
+
+==============================================================================
+目次							*vmock-contents*
+
+概要							|vmock-introduction|
+使い方							|vmock-usage|
+  vimtest						  |vmock-vimtest|
+  vmock単体での使用					  |vmock-standalone|
+  注意事項						  |vmock-notice|
+API							|vmock-api|
+  モック作成						  |vmock-new|
+  モック呼び出し時に期待する引数の指定			  |vmock-arg-matcher|
+  期待するモック呼び出し回数の指定			  |vmock-count-matcher|
+  戻り値の指定						  |vmock-return|
+  検証							  |vmock-verify|
+  事後処理						  |vmock-finally|
+サンプル						|vmock-example|
+TODO							|vmock-todo|
+更新履歴						|vmock-changelog|
+
+
+==============================================================================
+概要							*vmock-introduction*
+
+Vim scriptのテストを助けるためにモック機能を提供します。
+単純に戻り値を制御することから、引数や呼び出し回数の検証までを行えます。
+
+>
+	" コード例(ワンライナー)
+	call vmock#mock('SomeFunc').with(arg1, arg2).return(val).once()
+<
+>
+	" コード例(変数経由)
+	let vmock = vmock#mock('SomeFunc')
+	call vmock.with(arg1, arg2)
+	call vmock.return(val)
+	call vmock.once()
+<
+
+最新版:
+http://github.com/kannokanno/vmock
+
+
+==============================================================================
+使い方							*vmock-usage*
+
+vmockの使い方は大きく分けて2つあります。
+
+1.	テストプラグインの中で使う
+	検証や事後処理のためのコードをユーザーが書く必要はありません。
+	検証時のメッセージはテストプラグインに合わせて出力されます。
+
+2.	vmock単体で使う
+	検証や事後処理のためのコードをユーザーが書く必要があります。
+
+vimtest ~
+							*vmock-vimtest*
+
+現在は未対応ですが、将来サポート予定です。
+
+
+単体での使用 ~
+							*vmock-standalone*
+
+本来は他のテストプラグインと連携して使うことを目的としていますが、vmock単体で
+も利用することができます。
+
+単体で使うには以下の条件を守る必要があります。
+
+- モック検証のために |vmock#verify()| を呼ぶ
+- モック作成 ~ 検証までをtry文で囲う
+- 関数定義を復元するためにfinally句で |vmock#clear()| を呼ぶ
+
+コード例を以下に示します。
+なお、単体で使用する場合の例は |vmock-example| にあります。
+>
+	try
+	  call vmock#mock('SomeFunc').with(arg1, arg2).return(value).once()
+	
+	  " SomeFunc is called inside
+	  let actual = s:do_something(arg1, arg2)
+	
+	  call vmock#verify()
+	catch
+	  echoerr v:exception
+	finally
+	  call vmock#clear()
+	endtry
+<
+
+注意事項 ~
+							*vmock-notice*
+
+以下の定義を持つ関数をモックにした場合、 |vmock#clear()| にて復元してもこれら
+の定義は戻りません。
+
+[range] [abort] [dict]
+
+
+==============================================================================
+API							*vmock-api*
+
+モック作成 ~
+							*vmock-new*
+
+vmock#mock({func})					*vmock#mock()*
+	新しくモックを作成します。
+	この段階で対象の関数はモック用に再定義されていることに注意してくださ
+	い。
+	元の関数定義に戻す場合は |vmock#clear()| を呼ぶ必要があります。
+
+	引数:
+	    {func} - モックにしたい関数名(文字列)、もしくは |Funcref|
+
+	戻り値:
+	    モックAPI用の辞書を返します。
+	    このオブジェクトから以下のAPIを呼び出すことが出来ます。
+	    - |vmock.with()|
+	    - |vmock-count-matcher|
+	    - |vmock-return|
+
+	使用例:
+>
+	    " グローバル関数名
+	    let vmock = vmock#mock('SomeGlobalFunc')
+	    " autoload関数
+	    let vmock = vmock#mock('some_plugin#func')
+	    " 辞書関数
+	    let vmock = vmock#mock('g:some_dict.func')
+	    " Funcref
+	    let vmock = vmock#mock(function('SomeGlobalFunc'))
+<
+
+モック呼び出し時に期待する引数の指定 ~
+							*vmock-arg-matcher*
+
+|vmock#mock()| で作成したモックは引数に制限がありません。
+しかし |vmock.with()| を使うことにより引数の検証が可能になります。
+>
+	    " 引数1つの場合
+	    call vmock#mock('Func').with('foo')
+	    " 引数が複数の場合
+	    call vmock#mock('Func').with('foo', 'bar', 1)
+<
+
+また後述するAPIを通した値を with() に渡すことにより、様々な比較による検証が可
+能になります。
+>
+	    " 引数1つの場合
+	    call vmock#mock('Func').with(vmock#any())
+	    " 引数が複数の場合
+	    call vmock#mock('Func')
+	          \.with(vmock#any(), vmock#eq('bar'), vmock#type(0))
+<
+
+なお、これらの検証はモック呼び出し時には行われません。
+|vmock-verify| の段階で初めて検証されます。
+
+vmock.with({expected})					*vmock.with()*
+	これは |vmock#eq()| を呼ぶのと同等です。
+
+	引数:
+	    {expected} - モックの引数として期待する値
+
+	戻り値:
+	    モックAPI用の辞書を返します。
+	    このオブジェクトから以下のAPIを呼び出すことが出来ます。
+	    - |vmock-count-matcher|
+	    - |vmock-return|
+
+	使用例:
+>
+	    call vmock#mock('Func').with('foo')
+<
+
+vmock#any()						*vmock#any()*
+	実引数がどんな値でも必ず成功します。
+	|vmock#mock()| でモックを作成した段階ではこのMatcherが設定されていま
+	す。
+
+	戻り値:
+	    モックAPI用の辞書を返します。
+	    このオブジェクトから以下のAPIを呼び出すことが出来ます。
+	    - |vmock-count-matcher|
+	    - |vmock-return|
+
+	使用例:
+>
+	    call vmock#mock('Func').with(vmock#any())
+<
+
+vmock#eq({expected})					*vmock#eq()*
+	{expected} と実引数の型が同じで、かつ ==# の比較が1を返す場合に成功しま
+	す。 ==# については |expr-==#| を参照してください。
+	これと同等のAPIとして |vmock.with()| があるため、明示的に書きたい場合
+	を除いてこのAPIを呼び出すことはないでしょう。
+
+	引数:
+	    {expected} - モックの引数として期待する値
+
+	戻り値:
+	    モックAPI用の辞書を返します。
+	    このオブジェクトから以下のAPIを呼び出すことが出来ます。
+	    - |vmock-count-matcher|
+	    - |vmock-return|
+
+	使用例:
+>
+	    call vmock#mock('Func').with(vmock#eq('foo'))
+<
+
+vmock#not_eq({expected})				*vmock#not_eq()*
+	{expected} と実引数の型が異なるか、==# の比較が0を返す場合に成功しま
+	す。 ==# については |expr-==#| を参照してください。
+
+	引数:
+	    {expected} - モックの引数として期待する値
+
+	戻り値:
+	    モックAPI用の辞書を返します。
+	    このオブジェクトから以下のAPIを呼び出すことが出来ます。
+	    - |vmock-count-matcher|
+	    - |vmock-return|
+
+	使用例:
+>
+	    call vmock#mock('Func').with(vmock#not_eq('foo'))
+<
+
+vmock#loose_eq({expected})				*vmock#loose_eq()*
+	{expected} と実引数の型が同じで、かつ ==? の比較が1を返す場合に成功しま
+	す。 ==? については |expr-==?| を参照してください。
+
+	引数:
+	    {expected} - モックの引数として期待する値
+
+	戻り値:
+	    モックAPI用の辞書を返します。
+	    このオブジェクトから以下のAPIを呼び出すことが出来ます。
+	    - |vmock-count-matcher|
+	    - |vmock-return|
+
+	使用例:
+>
+	    call vmock#mock('Func').with(vmock#loose_eq('foo'))
+<
+
+vmock#loose_not_eq({expected})				*vmock#loose_not_eq()*
+	{expected} と実引数の型が異なるか、==? の比較が0を返す場合に成功しま
+	す。 ==? については |expr-==?| を参照してください。
+
+	引数:
+	    {expected} - モックの引数として期待する値
+
+	戻り値:
+	    モックAPI用の辞書を返します。
+	    このオブジェクトから以下のAPIを呼び出すことが出来ます。
+	    - |vmock-count-matcher|
+	    - |vmock-return|
+
+	使用例:
+>
+	    call vmock#mock('Func').with(vmock#loose_not_eq('foo'))
+<
+
+vmock#type({expected})					*vmock#type()*
+	type({expected}) ==# type(実引数)の比較が1を返す場合に成功します。
+
+	引数:
+	    {expected} - モックの引数として期待する型の値
+			 この値は内部でtype()にかけるため、ユーザーが型の数値
+			 を渡す必要はない。
+
+	戻り値:
+	    モックAPI用の辞書を返します。
+	    このオブジェクトから以下のAPIを呼び出すことが出来ます。
+	    - |vmock-count-matcher|
+	    - |vmock-return|
+
+	使用例:
+>
+	    call vmock#mock('Func').with(vmock#type('str'))
+<
+
+vmock#not_type({expected})				*vmock#not_type()*
+	type({expected}) ==# type(実引数)の比較が0を返す場合に成功します。
+
+	引数:
+	    {expected} - モックの引数として期待する型の値
+			 この値は内部でtype()にかけるため、ユーザーが型の数値
+			 を渡す必要はない。
+
+	戻り値:
+	    モックAPI用の辞書を返します。
+	    このオブジェクトから以下のAPIを呼び出すことが出来ます。
+	    - |vmock-count-matcher|
+	    - |vmock-return|
+
+	使用例:
+>
+	    call vmock#mock('Func').with(vmock#not_type('str'))
+<
+
+vmock#has({expected})					*vmock#has()*
+	実引数がリストの場合、要素に {expected} が存在していれば成功します。
+	実引数が辞書の場合、キーに {expected} が存在していれば成功します。
+	実引数がリストでも辞書でもない場合は必ず失敗します。
+
+	引数:
+	    {expected} - 実引数がリストの場合は期待する要素
+			 実引数が辞書の場合は期待するキー
+
+	戻り値:
+	    モックAPI用の辞書を返します。
+	    このオブジェクトから以下のAPIを呼び出すことが出来ます。
+	    - |vmock-count-matcher|
+	    - |vmock-return|
+
+	使用例:
+>
+	    call vmock#mock('Func').with(vmock#has('key'))
+<
+
+vmock#not_has({expected})				*vmock#not_has()*
+	実引数がリストの場合、要素に {expected} が存在していなければ成功します。
+	実引数が辞書の場合、キーに {expected} が存在していなければ成功します。
+	実引数がリストでも辞書でもない場合は必ず失敗します。
+
+	引数:
+	    {expected} - 実引数がリストの場合は期待する要素
+			 実引数が辞書の場合は期待するキー
+
+	戻り値:
+	    モックAPI用の辞書を返します。
+	    このオブジェクトから以下のAPIを呼び出すことが出来ます。
+	    - |vmock-count-matcher|
+	    - |vmock-return|
+
+	使用例:
+>
+	    call vmock#mock('Func').with(vmock#not_has('not exists key'))
+<
+
+vmock#custom({equal-func-name})				*vmock#custom()*
+	ユーザー定義の {equal-func-name} を実行した結果が1であれば成功します。
+	標準のAPIでは不十分な場合において利用します。
+	{equal-func-name} は以下のシグネチャを持つ関数名です。
+
+	スコープ：グローバル
+	引数：1つ。実引数が渡される
+	戻り値：成功ならば1、失敗ならば0を返す
+
+	引数:
+	    {equal-func-name} - 比較を行う関数名(文字列)
+
+	戻り値:
+	    モックAPI用の辞書を返します。
+	    このオブジェクトから以下のAPIを呼び出すことが出来ます。
+	    - |vmock-count-matcher|
+	    - |vmock-return|
+
+	使用例:
+>
+	    " ユーザー定義の比較関数
+	    function! g:is_even(arg)
+	      return a:arg % 2 ==# 0
+	    endfunction
+	
+	    call vmock#mock('Func').with(vmock#custom('g:is_even'))
+<
+
+期待するモック呼び出し回数の指定 ~
+							*vmock-count-matcher*
+
+|vmock#mock()| で作成したモックは呼び出し回数に制限がありません。
+後述するAPIを利用することにより、モックの呼び出し回数を検証することができま
+す。
+
+vmock.any()						*vmock.any()*
+	モックの呼び出し回数に制限を設けません。何度呼ばれようと、または1度も
+	呼ばれなくても必ず成功します。
+	|vmock#mock()| でモックを作成した段階ではこのMatcherが設定されていま
+	す。
+
+	戻り値:
+	    モックAPI用の辞書を返します。
+	    このオブジェクトから以下のAPIを呼び出すことが出来ます。
+	    - |vmock.with()|
+	    - |vmock-return|
+
+	使用例:
+>
+	    call vmock#mock('Func').any()
+<
+
+vmock.never()						*vmock.never()*
+	モックが1度も呼ばれなかった場合のみ成功します。
+	(実回数 < 1)
+
+	戻り値:
+	    モックAPI用の辞書を返します。
+	    このオブジェクトから以下のAPIを呼び出すことが出来ます。
+	    - |vmock.with()|
+	    - |vmock-return|
+
+	使用例:
+>
+	    call vmock#mock('Func').never()
+<
+
+vmock.once()						*vmock.once()*
+	モックが1度だけ呼ばれた場合のみ成功します。
+	(実回数 == 1)
+
+	戻り値:
+	    モックAPI用の辞書を返します。
+	    このオブジェクトから以下のAPIを呼び出すことが出来ます。
+	    - |vmock.with()|
+	    - |vmock-return|
+
+	使用例:
+>
+	    call vmock#mock('Func').once()
+<
+
+vmock.times({expected})					*vmock.times()*
+	モックが正確に {expected} 回数だけ呼ばれた場合のみ成功します。
+	(実回数 == {expected})
+
+	引数:
+	    {expected} - モックが呼ばれる回数(数値)
+
+	戻り値:
+	    モックAPI用の辞書を返します。
+	    このオブジェクトから以下のAPIを呼び出すことが出来ます。
+	    - |vmock.with()|
+	    - |vmock-count-matcher|
+
+	使用例:
+>
+	    call vmock#mock('Func').times(2)
+<
+
+vmock.at_least({expected})				*vmock.at_least()*
+	モックの呼ばれた回数が {expected} 以上の場合のみ成功します。
+	({expected} <= 実回数)
+
+	引数:
+	    {expected} - モックが最少で呼ばれる回数(数値)
+
+	戻り値:
+	    モックAPI用の辞書を返します。
+	    このオブジェクトから以下のAPIを呼び出すことが出来ます。
+	    - |vmock.with()|
+	    - |vmock-count-matcher|
+
+	使用例:
+>
+	    call vmock#mock('Func').at_least(2)
+<
+
+vmock.at_most({expected})				*vmock.at_most()*
+	モックの呼ばれた回数が {expected} 以内の場合のみ成功します。
+	(実回数 <= {expected})
+
+	引数:
+	    {expected} - モックが最多で呼ばれる回数(数値)
+
+	戻り値:
+	    モックAPI用の辞書を返します。
+	    このオブジェクトから以下のAPIを呼び出すことが出来ます。
+	    - |vmock.with()|
+	    - |vmock-count-matcher|
+
+	使用例:
+>
+	    call vmock#mock('Func').at_most(5)
+<
+
+戻り値の指定 ~
+							*vmock-return*
+
+|vmock#mock()| で作成したモックは呼び出されると0を返すようになっています。
+これはVim scriptの仕様に依存しています。Vim scriptでは戻り値を明記していない関
+数は0を返すようになっており、モックもそれに合わせています。
+
+|vmock.return()| を利用することにより、モックの戻り値を変更することができま
+す。
+
+vmock.return({value})					*vmock.return()*
+	モックが呼び出された際に {value} を返すようにします。
+
+	引数:
+	    {value} - モックの戻り値に指定する値
+
+	戻り値:
+	    モックAPI用の辞書を返します。
+	    このオブジェクトから以下のAPIを呼び出すことが出来ます。
+	    - |vmock.with()|
+	    - |vmock-count-matcher|
+
+	使用例:
+>
+	    call vmock#mock('Func').return(100)
+<
+
+検証 ~
+							*vmock-verify*
+
+このAPIはvmockを単体で使う場合(|vmock-standalone|)でのみ利用します。
+テストプラグインの中でvmockを使う場合はユーザーが明示的にこのAPIを呼ぶ必要はあ
+りません。
+
+vmock#verify()						*vmock#verify()*
+	作成された全てのモックに対して、実際に呼び出された回数と引数について検
+	証します。
+	検証に失敗した場合は例外が発生します。
+
+	戻り値:
+	    なし
+
+	使用例:
+>
+	    call vmock#verify()
+<
+vmock#verify_with_event({event})		*vmock#verify_with_event()*
+	作成された全てのモックに対して、実際に呼び出された回数と引数について検
+	証します。
+	検証に成功した場合と失敗した場合の挙動を {event} で制御します。
+
+	{event} は辞書であり、次の辞書関数が定義されている必要があります。
+	- on_success()
+	  成功時のイベントハンドラ。
+	  戻り値は特に使われない。
+	- on_failure({message})
+	  失敗時のイベントハンドラ。
+	  {message} には検証失敗のメッセージが渡される。
+	  戻り値は特に使われない。
+
+	引数:
+	    {event} - 成功/失敗時のイベントハンドラ
+
+	戻り値:
+	    なし
+
+	使用例:
+>
+	    " ユーザー定義
+	    let event = {}
+	    function! event.on_success()
+	      echo 'OK!'
+	    endfunction
+	
+	    function! event.on_failure(message)
+	      echo 'NG...:' . a:message
+	    endfunction
+	
+	    call vmock#verify_with_event(event)
+<
+
+事後処理 ~
+							*vmock-finally*
+
+このAPIはvmockを単体で使う場合(|vmock-standalone|)でのみ利用します。
+テストプラグインの中でvmockを使う場合はユーザーが明示的にこのAPIを呼ぶ必要はあ
+りません。
+
+vmock#clear()						*vclear#clear()*
+	作成されたモックを全て破棄します。
+	モックの元関数は定義が復元されます。
+
+	戻り値:
+	    なし
+
+	使用例:
+>
+	    call vmock#clear()
+<
+
+==============================================================================
+サンプル						*vmock-example*
+
+vmock/exampleフォルダに簡単なサンプルコードがあります。
+
+
+==============================================================================
+TODO							*vmock-todo*
+
+- 指定した回数での呼び出しに対応した検証(atの追加)
+- モックを呼び出したら指定した例外を発生できるようにする(throwの追加)
+
+==============================================================================
+更新履歴						*vmock-changelog*
+
+1.0	2013-07-14
+	- 初版
+
+
+vim:tw=78:ts=8:ft=help:norl:
