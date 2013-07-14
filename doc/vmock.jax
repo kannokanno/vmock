@@ -11,7 +11,7 @@ Author: kanno <akapanna@gmail.com>
   vimtest						  |vmock-vimtest|
   vmock単体での使用					  |vmock-standalone|
   注意事項						  |vmock-notice|
-API							|vmock-api|
+vmock-API						|vmock-api|
   モック作成						  |vmock-new|
   モック呼び出し時に期待する引数の指定			  |vmock-arg-matcher|
   期待するモック呼び出し回数の指定			  |vmock-count-matcher|
@@ -19,7 +19,7 @@ API							|vmock-api|
   検証							  |vmock-verify|
   事後処理						  |vmock-finally|
 サンプル						|vmock-example|
-TODO							|vmock-todo|
+vmock-TODO						|vmock-todo|
 更新履歴						|vmock-changelog|
 
 
@@ -60,6 +60,8 @@ vmockの使い方は大きく分けて2つあります。
 vimtest ~
 							*vmock-vimtest*
 
+https://github.com/kannokanno/vimtest
+
 現在は未対応ですが、将来サポート予定です。
 
 
@@ -72,7 +74,7 @@ vimtest ~
 単体で使うには以下の条件を守る必要があります。
 
 - モック検証のために |vmock#verify()| を呼ぶ
-- モック作成 ~ 検証までをtry文で囲う
+- モック作成から検証までをtry-finallyで囲う
 - 関数定義を復元するためにfinally句で |vmock#clear()| を呼ぶ
 
 コード例を以下に示します。
@@ -102,15 +104,14 @@ vimtest ~
 
 
 ==============================================================================
-API							*vmock-api*
+vmock-API						*vmock-api*
 
 モック作成 ~
 							*vmock-new*
 
 vmock#mock({func})					*vmock#mock()*
-	新しくモックを作成します。
-	この段階で対象の関数はモック用に再定義されていることに注意してくださ
-	い。
+	モックを新しく作成します。
+	この段階で対象の関数はモック用に再定義されることに注意してください。
 	元の関数定義に戻す場合は |vmock#clear()| を呼ぶ必要があります。
 
 	引数:
@@ -179,8 +180,7 @@ vmock.with({expected})					*vmock.with()*
 
 vmock#any()						*vmock#any()*
 	実引数がどんな値でも必ず成功します。
-	|vmock#mock()| でモックを作成した段階ではこのMatcherが設定されていま
-	す。
+	|vmock#mock()| でモックを作成した段階ではこのMatcherが設定されています。
 
 	戻り値:
 	    モックAPI用の辞書を返します。
@@ -195,7 +195,7 @@ vmock#any()						*vmock#any()*
 
 vmock#eq({expected})					*vmock#eq()*
 	{expected} と実引数の型が同じで、かつ ==# の比較が1を返す場合に成功しま
-	す。 ==# については |expr-==#| を参照してください。
+	す。 ==# については :help expr-==# を参照してください。
 	これと同等のAPIとして |vmock.with()| があるため、明示的に書きたい場合
 	を除いてこのAPIを呼び出すことはないでしょう。
 
@@ -214,8 +214,8 @@ vmock#eq({expected})					*vmock#eq()*
 <
 
 vmock#not_eq({expected})				*vmock#not_eq()*
-	{expected} と実引数の型が異なるか、==# の比較が0を返す場合に成功しま
-	す。 ==# については |expr-==#| を参照してください。
+	{expected} と実引数の型が異なるか、==# の比較が0を返す場合に成功します。
+	==# については :help expr-==# を参照してください。
 
 	引数:
 	    {expected} - モックの引数として期待する値
@@ -232,8 +232,8 @@ vmock#not_eq({expected})				*vmock#not_eq()*
 <
 
 vmock#loose_eq({expected})				*vmock#loose_eq()*
-	{expected} と実引数の型が同じで、かつ ==? の比較が1を返す場合に成功しま
-	す。 ==? については |expr-==?| を参照してください。
+	{expected} と実引数の型が同じで、かつ ==? の比較が1を返す場合に成功します。
+	==? については :help expr-==? を参照してください。
 
 	引数:
 	    {expected} - モックの引数として期待する値
@@ -250,8 +250,8 @@ vmock#loose_eq({expected})				*vmock#loose_eq()*
 <
 
 vmock#loose_not_eq({expected})				*vmock#loose_not_eq()*
-	{expected} と実引数の型が異なるか、==? の比較が0を返す場合に成功しま
-	す。 ==? については |expr-==?| を参照してください。
+	{expected} と実引数の型が異なるか、==? の比較が0を返す場合に成功します。
+	==? については :help expr-==? を参照してください。
 
 	引数:
 	    {expected} - モックの引数として期待する値
@@ -366,11 +366,11 @@ vmock#custom({equal-func-name})				*vmock#custom()*
 	使用例:
 >
 	    " ユーザー定義の比較関数
-	    function! g:is_even(arg)
+	    function! IsEven(arg)
 	      return a:arg % 2 ==# 0
 	    endfunction
 	
-	    call vmock#mock('Func').with(vmock#custom('g:is_even'))
+	    call vmock#mock('Func').with(vmock#custom('IsEven'))
 <
 
 期待するモック呼び出し回数の指定 ~
@@ -383,8 +383,7 @@ vmock#custom({equal-func-name})				*vmock#custom()*
 vmock.any()						*vmock.any()*
 	モックの呼び出し回数に制限を設けません。何度呼ばれようと、または1度も
 	呼ばれなくても必ず成功します。
-	|vmock#mock()| でモックを作成した段階ではこのMatcherが設定されていま
-	す。
+	|vmock#mock()| でモックを作成した段階ではこのMatcherが設定されています。
 
 	戻り値:
 	    モックAPI用の辞書を返します。
@@ -464,7 +463,7 @@ vmock.at_least({expected})				*vmock.at_least()*
 <
 
 vmock.at_most({expected})				*vmock.at_most()*
-	モックの呼ばれた回数が {expected} 以内の場合のみ成功します。
+	モックの呼ばれた回数が {expected} 以下の場合のみ成功します。
 	(実回数 <= {expected})
 
 	引数:
@@ -488,8 +487,7 @@ vmock.at_most({expected})				*vmock.at_most()*
 これはVim scriptの仕様に依存しています。Vim scriptでは戻り値を明記していない関
 数は0を返すようになっており、モックもそれに合わせています。
 
-|vmock.return()| を利用することにより、モックの戻り値を変更することができま
-す。
+|vmock.return()| を利用することにより、モックの戻り値を変更することができます。
 
 vmock.return({value})					*vmock.return()*
 	モックが呼び出された際に {value} を返すようにします。
@@ -588,7 +586,7 @@ vmock/exampleフォルダに簡単なサンプルコードがあります。
 
 
 ==============================================================================
-TODO							*vmock-todo*
+vmock-TODO							*vmock-todo*
 
 - 指定した回数での呼び出しに対応した検証(atの追加)
 - モックを呼び出したら指定した例外を発生できるようにする(throwの追加)

@@ -1,2 +1,3 @@
 test/.vimrc
+doc/tags-*
 autoload/vmock/autoload_tmpfile.vim
