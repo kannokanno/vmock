@@ -50,3 +50,19 @@ function! s:t.exists_return()
   call self.assert.success()
 endfunction
 "}}}
+" --sample flow "{{{
+function! s:t.call_by_variable()
+  let mock = vmock#mock(self._one_args_func_name)
+  call mock.with(vmock#eq('foo'))
+  call mock.return(100)
+  call self.assert.equals(100, call(self._one_args_func_name, ['foo']))
+  call self.assert.success()
+endfunction
+function! s:t.multiple_mock()
+  call vmock#mock(self._one_args_func_name).with(vmock#eq('foo')).return(100)
+  call vmock#mock(self._multi_line_body_func_name).return({'aa': 10})
+
+  call self.assert.equals(100, call(self._one_args_func_name, ['foo']))
+  call self.assert.equals({'aa': 10}, call(self._multi_line_body_func_name, []))
+endfunction
+"}}}
