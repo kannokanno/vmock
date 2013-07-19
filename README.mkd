@@ -14,7 +14,7 @@ call vmock#mock('SomeGlobalFunc').with(arg1, arg2).return(items).once()
 
 ## 連携できるテストフレームワーク
 
-現時点では何もありませんが、[kannokanno/vimtest](https://github.com/kannokanno/vimtest)に対応予定です。
+* [kannokanno/vimtest](https://github.com/kannokanno/vimtest)
 
 ## 使い方
 

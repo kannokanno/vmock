@@ -62,8 +62,20 @@ vimtest ~
 
 https://github.com/kannokanno/vimtest
 
-現在は未対応ですが、将来サポート予定です。
-
+テストケースの中でvmockを使用出来ます。
+単体使用の場合と異なり、 |vmock#verify()| や |vmock#clear()| を呼ぶ必要はあり
+ません。
+>
+	let s:testcase = vimtest#new()
+	function! s:testcase.test()
+	  " original return value
+	  call self.assert.equals(1, SomeFunc('arg'))
+	  " mock setting
+	  call vmock#mock('SomeFunc').with('arg').return(100).once()
+	  " mock return value
+	  call self.assert.equals(100, g:vimtest_test_func_one_args('arg'))
+	endfunction
+<
 
 単体での使用 ~
 							*vmock-standalone*
