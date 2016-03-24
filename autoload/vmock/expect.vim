@@ -1,3 +1,4 @@
+scriptencoding utf-8
 " AUTHOR: kanno <akapanna@gmail.com>
 " License: This file is placed in the public domain.
 let s:save_cpo = &cpo
