@@ -87,7 +87,7 @@ endfunction
 "  'function FooFunc(first)'         -> ['first']
 "  'function FooFunc(first, second)' -> ['first', 'second']
 function! s:get_arg_names(define_lines)
-  let args = substitute(a:define_lines[0], ".*function.*(\\(.*\\))", '\1', '')
+  let args = matchstr(a:define_lines[0], 'function[^(]\+(\zs[^)]\+\ze)')
   return split(args, ', ')
 endfunction
 
