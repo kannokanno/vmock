@@ -78,7 +78,7 @@ function! s:make_prototype(matchers)
   endfunction
 
   function! obj.recording(args)
-    let self.__actual_args = a:args
+    let self.__actual_args = deepcopy(a:args)
   endfunction
 
   function! obj.validate()
