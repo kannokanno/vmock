@@ -15,6 +15,7 @@ call vmock#mock('SomeGlobalFunc').with(arg1, arg2).return(items).once()
 ## 連携できるテストフレームワーク
 
 * [kannokanno/vimtest](https://github.com/kannokanno/vimtest)
+* [thinca/vim-themis](https://github.com/thinca/vim-themis)
 
 ## 使い方
 
@@ -37,7 +38,7 @@ let mock = vmock#mock('some_plugin#func')
 __辞書関数__
 
 ```vim
-let mock = vmock#mock('g:some_dict.func')
+let mock = vmock#mock('SomeDict.func')
 ```
 
 __Funcref__
@@ -138,6 +139,20 @@ catch
 finally
   call vmock#clear()
 endtry
+```
+
+### 開発者向け - 単体テストについて
+
+vmockのテストにはvim-themisが使われています。
+実行例は以下の通り。
+
+```
+$ <themisの実行コマンド> --runtimepath <vmockのルートディレクトリ> -r <テスト対象のパス>
+
+# sample
+$ pwd
+/Users/kanno/tmp/vmock
+$ ~/.vim/bundle/vim-themis/bin/themis --runtimepath ~/tmp/vmock -r test
 ```
 
 ### その他
