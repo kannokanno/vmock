@@ -1,4 +1,4 @@
-let s:suite = themis#suite('vmock')
+let s:suite = themis#suite('vmock#mock')
 let s:assert = themis#helper('assert')
 
 function! s:suite.before_each()
