@@ -286,6 +286,7 @@ function! s:t.make_mock_body()
         \ ['g:vmock_test_func', [], '[]'],
         \ ['hoge#hoge', ['a', 'bb'], "[a:a,a:bb]"],
         \ ['Global', ['...'], 'a:000'],
+        \ ['Global', ['a', '...'], "[a:a,a:000]"],
         \ ['g:dict.hoge', ['one'], "[a:one]"],
         \]
   for pat in patterns
