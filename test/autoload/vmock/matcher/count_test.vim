@@ -1,4 +1,4 @@
-let s:suite = themis#suite('vmock#expect')
+let s:suite = themis#suite('vmock#matcher#count')
 let s:assert = themis#helper('assert')
 
 function! s:suite.once()
