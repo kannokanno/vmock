@@ -1,7 +1,7 @@
-function! g:make_test()
-  let t = vimtest#new('UAT - define pattern - Funcref')
+function! VMockMakeUATSuite()
+  let t = themis#suite('UAT - define pattern - Funcref')
 
-  function! t.setup()
+  function! t.before_each()
     function! VMockTestFuncrefNoArgs()
       return 'ORIGIN'
     endfunction
@@ -62,7 +62,7 @@ function! g:make_test()
 
   endfunction
 
-  function! t.teardown()
+  function! t.after_each()
     delfunction VMockTestFuncrefNoArgs
     delfunction VMockTestFuncrefOneArgs
     delfunction VMockTestFuncrefTwoArgs

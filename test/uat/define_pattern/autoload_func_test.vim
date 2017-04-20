@@ -1,6 +1,6 @@
 let s:source_path = expand('<sfile>:p:h') . '/../../../autoload/vmock/for_test/testdata.vim'
-function! g:make_test()
-  let t = vimtest#new('UAT - define pattern - autoload#func')
+function! VMockMakeUATSuite()
+  let t = themis#suite('UAT - define pattern - autoload#func')
 
   let t._no_args_func_name = 'vmock#for_test#testdata#func_no_args'
   let t._one_args_func_name = 'vmock#for_test#testdata#func_one_args'
@@ -14,15 +14,15 @@ function! g:make_test()
   let t._no_return_func_name = 'vmock#for_test#testdata#func_no_return'
   let t._exists_return_func_name = 'vmock#for_test#testdata#func_exists_return'
 
-  function! t.startup()
+  function! t.before()
     call vmock#for_test#testdata#load()
   endfunction
 
-  function! t.setup()
+  function! t.before_each()
     exe 'source ' . s:source_path
   endfunction
 
-  function! t.teardown()
+  function! t.after_each()
     delfunction vmock#for_test#testdata#func_no_args
     delfunction vmock#for_test#testdata#func_one_args
     delfunction vmock#for_test#testdata#func_two_args
