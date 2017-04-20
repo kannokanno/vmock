@@ -71,7 +71,7 @@ function! s:convert_matcher(src)
 endfunction
 
 function! s:make_prototype(matchers)
-  let obj = {'__matchers': a:matchers, '__matchers_len': len(a:matchers), '__fail_message': ''}
+  let obj = {'__matchers': a:matchers, '__matchers_len': len(a:matchers), '__actual_args': [], '__fail_message': ''}
 
   function! obj.get_matchers()
     return self.__matchers
