@@ -1,63 +1,66 @@
 " 細かいパターンはUAT側でカバーしている
-let s:t = vimtest#new('vmock#function_define#get() - g:func') "{{{
+let s:suite = themis#suite('vmock#function_define - global function')
+let s:assert = themis#helper('assert')
 
-function! s:t.teardown()
-  delfunction g:vmock_global_func
+function! s:suite.after_each()
+  if exists('VMockGlobalFunc')
+    delfunction VMockGlobalFunc
+  endif
 endfunction
 
-function! s:t.no_args()
-  function! g:vmock_global_func()
+function! s:suite.get_no_args()
+  function! VMockGlobalFunc()
   endfunction
-  let define = vmock#function_define#get('g:vmock_global_func')
-  call self.assert.equals('g:vmock_global_func', define.funcname)
-  call self.assert.equals([], define.arg_names)
+  let define = vmock#function_define#get('VMockGlobalFunc')
+  call s:assert.equals('VMockGlobalFunc', define.funcname)
+  call s:assert.equals([], define.arg_names)
 endfunction
 
-function! s:t.one_arg()
-  function! g:vmock_global_func(name)
+function! s:suite.get_one_arg()
+  function! VMockGlobalFunc(name)
   endfunction
-  let define = vmock#function_define#get('g:vmock_global_func')
-  call self.assert.equals('g:vmock_global_func', define.funcname)
-  call self.assert.equals(['name'], define.arg_names)
+  let define = vmock#function_define#get('VMockGlobalFunc')
+  call s:assert.equals('VMockGlobalFunc', define.funcname)
+  call s:assert.equals(['name'], define.arg_names)
 endfunction
 
-function! s:t.two_arg()
-  function! g:vmock_global_func(name, value)
+function! s:suite.get_two_arg()
+  function! VMockGlobalFunc(name, value)
   endfunction
-  let define = vmock#function_define#get('g:vmock_global_func')
-  call self.assert.equals('g:vmock_global_func', define.funcname)
-  call self.assert.equals(['name', 'value'], define.arg_names)
+  let define = vmock#function_define#get('VMockGlobalFunc')
+  call s:assert.equals('VMockGlobalFunc', define.funcname)
+  call s:assert.equals(['name', 'value'], define.arg_names)
 endfunction
 
-function! s:t.variable_length_arg()
-  function! g:vmock_global_func(...)
+function! s:suite.get_variable_length_arg()
+  function! VMockGlobalFunc(...)
   endfunction
-  let define = vmock#function_define#get('g:vmock_global_func')
-  call self.assert.equals('g:vmock_global_func', define.funcname)
-  call self.assert.equals(['...'], define.arg_names)
+  let define = vmock#function_define#get('VMockGlobalFunc')
+  call s:assert.equals('VMockGlobalFunc', define.funcname)
+  call s:assert.equals(['...'], define.arg_names)
 endfunction
 
-function! s:t.no_body()
-  function! g:vmock_global_func(arg)
+function! s:suite.get_no_body()
+  function! VMockGlobalFunc(arg)
   endfunction
-  let define = vmock#function_define#get('g:vmock_global_func')
-  call self.assert.equals('g:vmock_global_func', define.funcname)
-  call self.assert.equals('', define.body)
+  let define = vmock#function_define#get('VMockGlobalFunc')
+  call s:assert.equals('VMockGlobalFunc', define.funcname)
+  call s:assert.equals('', define.body)
 endfunction
 
-function! s:t.one_line_body()
-  function! g:vmock_global_func(arg)
+function! s:suite.get_one_line_body()
+  function! VMockGlobalFunc(arg)
     return s:hogehoge()
   endfunction
-  let define = vmock#function_define#get('g:vmock_global_func')
-  call self.assert.equals('g:vmock_global_func', define.funcname)
-  call self.assert.equals(join([
+  let define = vmock#function_define#get('VMockGlobalFunc')
+  call s:assert.equals('VMockGlobalFunc', define.funcname)
+  call s:assert.equals(join([
         \ 'return s:hogehoge()',
         \ ], "\n"), define.body)
 endfunction
 
-function! s:t.multi_line_body()
-  function! g:vmock_global_func(arg)
+function! s:suite.get_multi_line_body()
+  function! VMockGlobalFunc(arg)
     let a = 1
     let b = 2
     if a ==# b
@@ -65,9 +68,9 @@ function! s:t.multi_line_body()
     endif
     return 'piyo'
   endfunction
-  let define = vmock#function_define#get('g:vmock_global_func')
-  call self.assert.equals('g:vmock_global_func', define.funcname)
-  call self.assert.equals(join([
+  let define = vmock#function_define#get('VMockGlobalFunc')
+  call s:assert.equals('VMockGlobalFunc', define.funcname)
+  call s:assert.equals(join([
         \ "let a = 1",
         \ "let b = 2",
         \ "if a ==# b",
@@ -77,8 +80,8 @@ function! s:t.multi_line_body()
         \ ], "\n"), define.body)
 endfunction
 
-function! s:t.multi_line_and_no_return_body()
-  function! g:vmock_global_func(arg)
+function! s:suite.get_multi_line_and_no_return_body()
+  function! VMockGlobalFunc(arg)
     let a = 1
     let b = 2
     let b = 2
@@ -95,10 +98,10 @@ function! s:t.multi_line_and_no_return_body()
       echo 'OK!'
     endif
   endfunction
-  let define = vmock#function_define#get('g:vmock_global_func')
-  call self.assert.equals('g:vmock_global_func', define.funcname)
+  let define = vmock#function_define#get('VMockGlobalFunc')
+  call s:assert.equals('VMockGlobalFunc', define.funcname)
   " 行番号の桁数によってインデントがずれてしまう
-  call self.assert.equals(join([
+  call s:assert.equals(join([
         \ "let a = 1",
         \ "let b = 2",
         \ "let b = 2",
@@ -116,172 +119,136 @@ function! s:t.multi_line_and_no_return_body()
         \ "endif",
         \ ], "\n"), define.body)
 endfunction
-"}}}
-let s:t = vimtest#new('vmock#function_define#override() - g:func') "{{{
 
-function! s:t.teardown()
-  if exists('g:vmock_global_func')
-    delfunction g:vmock_global_func
-  endif
-endfunction
-
-function! s:t.no_args()
-  function! g:vmock_global_func()
+function! s:suite.override_no_args()
+  function! VMockGlobalFunc()
     return 10
   endfunction
-  call self.assert.equals(10, g:vmock_global_func())
-  call vmock#function_define#override('g:vmock_global_func', [], 'return 100')
+  call s:assert.equals(10, VMockGlobalFunc())
+  call vmock#function_define#override('VMockGlobalFunc', [], 'return 100')
 
-  call self.assert.equals(100, g:vmock_global_func())
-  call self.assert.equals(join([
+  call s:assert.equals(100, VMockGlobalFunc())
+  call s:assert.equals(join([
         \ '',
-        \ '   function g:vmock_global_func()',
+        \ '   function VMockGlobalFunc()',
         \ '1  return 100',
         \ '   endfunction',
-        \ ], "\n"), s:get_define_string('g:vmock_global_func'))
+        \ ], "\n"), s:get_define_string('VMockGlobalFunc'))
 endfunction
 
-function! s:t.one_args()
-  function! g:vmock_global_func(first)
+function! s:suite.override_one_args()
+  function! VMockGlobalFunc(first)
     return a:first * 10
   endfunction
-  call self.assert.equals(100, g:vmock_global_func(10))
-  call vmock#function_define#override('g:vmock_global_func', ['first'], 'return a:first + 10')
+  call s:assert.equals(100, VMockGlobalFunc(10))
+  call vmock#function_define#override('VMockGlobalFunc', ['first'], 'return a:first + 10')
 
-  call self.assert.equals(20, g:vmock_global_func(10))
-  call self.assert.equals(join([
+  call s:assert.equals(20, VMockGlobalFunc(10))
+  call s:assert.equals(join([
         \ '',
-        \ '   function g:vmock_global_func(first)',
+        \ '   function VMockGlobalFunc(first)',
         \ '1  return a:first + 10',
         \ '   endfunction',
-        \ ], "\n"), s:get_define_string('g:vmock_global_func'))
+        \ ], "\n"), s:get_define_string('VMockGlobalFunc'))
 endfunction
 
-function! s:t.two_args()
-  function! g:vmock_global_func(first, second)
+function! s:suite.override_two_args()
+  function! VMockGlobalFunc(first, second)
     return a:first * a:second
   endfunction
-  call self.assert.equals(100, g:vmock_global_func(10, 10))
-  call vmock#function_define#override('g:vmock_global_func', ['first', 'second'], 'return a:first + a:second')
+  call s:assert.equals(100, VMockGlobalFunc(10, 10))
+  call vmock#function_define#override('VMockGlobalFunc', ['first', 'second'], 'return a:first + a:second')
 
-  call self.assert.equals(20, g:vmock_global_func(10, 10))
-  call self.assert.equals(join([
+  call s:assert.equals(20, VMockGlobalFunc(10, 10))
+  call s:assert.equals(join([
         \ '',
-        \ '   function g:vmock_global_func(first, second)',
+        \ '   function VMockGlobalFunc(first, second)',
         \ '1  return a:first + a:second',
         \ '   endfunction',
-        \ ], "\n"), s:get_define_string('g:vmock_global_func'))
+        \ ], "\n"), s:get_define_string('VMockGlobalFunc'))
 endfunction
 
-function! s:t.variable_args()
-  function! g:vmock_global_func(...)
+function! s:suite.override_variable_args()
+  function! VMockGlobalFunc(...)
     return map(copy(a:000), 'v:val * 10')
   endfunction
-  call self.assert.equals([100, 200, 300], g:vmock_global_func(10, 20, 30))
-  call vmock#function_define#override('g:vmock_global_func', ['...'], 'return map(copy(a:000), "v:val + 1")')
+  call s:assert.equals([100, 200, 300], VMockGlobalFunc(10, 20, 30))
+  call vmock#function_define#override('VMockGlobalFunc', ['...'], 'return map(copy(a:000), "v:val + 1")')
 
-  call self.assert.equals([11, 21, 31], g:vmock_global_func(10, 20, 30))
-  call self.assert.equals(join([
+  call s:assert.equals([11, 21, 31], VMockGlobalFunc(10, 20, 30))
+  call s:assert.equals(join([
         \ '',
-        \ '   function g:vmock_global_func(...)',
+        \ '   function VMockGlobalFunc(...)',
         \ '1  return map(copy(a:000), "v:val + 1")',
         \ '   endfunction',
-        \ ], "\n"), s:get_define_string('g:vmock_global_func'))
+        \ ], "\n"), s:get_define_string('VMockGlobalFunc'))
 endfunction
 
-function! s:t.no_return()
-  function! g:vmock_global_func()
+function! s:suite.override_no_return()
+  function! VMockGlobalFunc()
     throw 'unexpected called'
   endfunction
-  call vmock#function_define#override('g:vmock_global_func', [], '')
-  call g:vmock_global_func()
-  call self.assert.equals(join([
+  call vmock#function_define#override('VMockGlobalFunc', [], '')
+  call VMockGlobalFunc()
+  call s:assert.equals(join([
         \ '',
-        \ '   function g:vmock_global_func()',
+        \ '   function VMockGlobalFunc()',
         \ '1   ',
         \ '   endfunction',
-        \ ], "\n"), s:get_define_string('g:vmock_global_func'))
+        \ ], "\n"), s:get_define_string('VMockGlobalFunc'))
 endfunction
 
-function! s:t.exception_when_funcname_is_empty()
-  call self.assert.throw('VMock:Function name required')
-  call vmock#function_define#override('', [], '')
+function! s:suite.override_exception_when_funcname_is_empty()
+  try
+    call vmock#function_define#override('', [], '')
+
+    " ここに到達したら失敗の証
+    call s:assert.true(0)
+  catch
+    call s:assert.equals(v:exception, 'VMock:Function name required')
+  endtry
 endfunction
-"}}}
-let s:t = vimtest#new('vmock#function_define#override() - GlobalFunc') "{{{
 
-function! s:t.teardown()
-  delfunction Vmock_global_func
-endfunction
 
-function! s:t.override()
-  function! Vmock_global_func()
-    return 10
-  endfunction
-  call self.assert.equals(10, Vmock_global_func())
-  call vmock#function_define#override('Vmock_global_func', [], 'return 100')
+let s:suite = themis#suite('vmock#function_define - autoload')
+let s:assert = themis#helper('assert')
 
-  call self.assert.equals(100, Vmock_global_func())
-  call self.assert.equals(join([
-        \ '',
-        \ '   function Vmock_global_func()',
-        \ '1  return 100',
-        \ '   endfunction',
-        \ ], "\n"), s:get_define_string('Vmock_global_func'))
-endfunction
-"}}}
-let s:t = vimtest#new('vmock#function_define#override() - autoload#func') "{{{
-
-function! s:t.teardown()
+function! s:suite.after_each()
   " TODO 元コードの再定義をベタ書きしてしまっている
   function! vmock#for_test#testdata#func()
     return 10
   endfunction
 endfunction
 
-function! s:t.override()
-  call self.assert.equals(10, vmock#for_test#testdata#func())
+function! s:suite.override()
+  call s:assert.equals(10, vmock#for_test#testdata#func())
   call vmock#function_define#override('vmock#for_test#testdata#func', [], 'return 100')
-  call self.assert.equals(100, vmock#for_test#testdata#func())
-  call self.assert.equals(join([
+  call s:assert.equals(100, vmock#for_test#testdata#func())
+  call s:assert.equals(join([
         \ '',
         \ '   function vmock#for_test#testdata#func()',
         \ '1  return 100',
         \ '   endfunction',
         \ ], "\n"), s:get_define_string('vmock#for_test#testdata#func'))
 endfunction
-"}}}
-let s:t = vimtest#new('vmock#function_define#override() - g:dict.func') "{{{
 
-function! s:t.teardown()
-  unlet! g:vmock_test_dict
-endfunction
 
-function! s:t.override()
-  let g:vmock_test_dict = {}
-  function! g:vmock_test_dict.func()
-    return 10
-  endfunction
-  call self.assert.equals(10, g:vmock_test_dict.func())
-  call vmock#function_define#override('g:vmock_test_dict.func', [], 'return 100')
+let s:suite = themis#suite('vmock#function_define#override_mock')
+let s:assert = themis#helper('assert')
 
-  call self.assert.equals(100, g:vmock_test_dict.func())
-  " TODO 関数名が番号(530とか)になっちゃうので定義一致のテストめんどい。
-endfunction
-"}}}
-let s:t = vimtest#new('vmock#function_define#override_mock()') "{{{
-
-function! s:t.call_test()
-  function! g:vmock_global_func()
+function! s:suite.call_test()
+  function! VMockGlobalFunc()
     return 10
   endfunction
   " エラーなく処理が終了することだけ確認
-  call vmock#function_define#override_mock({'funcname': 'g:vmock_test_func', 'arg_names': ['first']})
+  call vmock#function_define#override_mock({'funcname': 'VMockGlobalFunc', 'arg_names': ['first']})
 endfunction
-"}}}
-let s:t = vimtest#new('vmock#function_define#make_mock_body()') "{{{
 
-function! s:t.make_mock_body()
+
+let s:suite = themis#suite('vmock#function_define#make_mock_body()')
+let s:assert = themis#helper('assert')
+
+function! s:suite.make_mock_body()
   let patterns = [
         \ ['g:vmock_test_func', [], '[]'],
         \ ['hoge#hoge', ['a', 'bb'], "[a:a,a:bb]"],
@@ -292,52 +259,46 @@ function! s:t.make_mock_body()
   for pat in patterns
     let actual = vmock#function_define#make_mock_body(s:stub_define(pat[0], pat[1]))
     let expected = s:expected_statement(pat[0], pat[2])
-    call self.assert.equals(expected, actual)
+    call s:assert.equals(expected, actual)
   endfor
 endfunction
 
-function! s:stub_define(funcname, arg_names)
-  return {'funcname': a:funcname, 'arg_names': a:arg_names}
+
+let s:suite = themis#suite('vmock#function_define#validate()')
+let s:assert = themis#helper('assert')
+
+function! s:suite.success_when_exists_func()
+  call s:assert.true(vmock#function_define#validate('tr'))
 endfunction
 
-function! s:expected_statement(funcname, arg_variable)
-  let s = printf("call vmock#mock#called('%s', %s)", a:funcname, a:arg_variable)
-  let s .= "\n"
-  let s .= printf("return vmock#mock#return('%s')", a:funcname)
-  return s
-endfunction
-"}}}
-let s:t = vimtest#new('vmock#function_define#validate()') "{{{
-
-function! s:t.success_when_exists_func()
-  call self.assert.true(vmock#function_define#validate('tr'))
+function! s:suite.success_when_autoload()
+  call s:assert.true(vmock#function_define#validate('vmock#for_test#testdata#for_validate'))
 endfunction
 
-function! s:t.success_when_exists_dict_func()
-  let g:vmock_test_dict = {}
-  function! g:vmock_test_dict.something()
-  endfunction
+function! s:suite.exception_when_not_func()
+  try
+    call vmock#function_define#validate('$VIM')
 
-  call self.assert.true(vmock#function_define#validate('g:vmock_test_dict.something'))
-
-  unlet g:vmock_test_dict
+    " ここに到達したら失敗の証
+    call s:assert.true(0)
+  catch
+    call s:assert.equals(v:exception, 'Vim(if):E129: Function name required')
+  endtry
 endfunction
 
-function! s:t.success_when_autoload()
-  call self.assert.true(vmock#function_define#validate('vmock#for_test#testdata#for_validate'))
+function! s:suite.exception_when_undefined_func()
+  try
+    call vmock#function_define#validate('VMockUndeinfedFunc')
+
+    " ここに到達したら失敗の証
+    call s:assert.true(0)
+  catch
+    call s:assert.equals(v:exception, 'VMock:E123: Undefined function: VMockUndeinfedFunc')
+  endtry
 endfunction
 
-function! s:t.exception_when_not_func()
-  call self.assert.throw('E129')
-  call vmock#function_define#validate('$VIM')
-endfunction
 
-function! s:t.exception_when_undefined_func()
-  call self.assert.throw('VMock:E123: Undefined function: VMockUndeinfedFunc')
-  call vmock#function_define#validate('VMockUndeinfedFunc')
-endfunction
-"}}}
-
+" テスト用ヘルパー
 function! s:get_define_string(funcname)
   let out = ''
   redir => out
@@ -346,3 +307,15 @@ function! s:get_define_string(funcname)
   return out
 endfunction
 
+" テスト用ヘルパー
+function! s:stub_define(funcname, arg_names)
+  return {'funcname': a:funcname, 'arg_names': a:arg_names}
+endfunction
+
+" テスト用ヘルパー
+function! s:expected_statement(funcname, arg_variable)
+  let s = printf("call vmock#mock#called('%s', %s)", a:funcname, a:arg_variable)
+  let s .= "\n"
+  let s .= printf("return vmock#mock#return('%s')", a:funcname)
+  return s
+endfunction

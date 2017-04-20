@@ -1,5 +1,5 @@
-function! g:make_test()
-  let t = vimtest#new('UAT - define pattern - FooFunc')
+function! VMockMakeUATSuite()
+  let t = themis#suite('UAT - define pattern - FooFunc')
 
   let t._no_args_func_name = 'VMockTestFuncNoArgs'
   let t._one_args_func_name = 'VMockTestFuncOneArgs'
@@ -13,7 +13,7 @@ function! g:make_test()
   let t._no_return_func_name = 'VMockTestFuncNoReturn'
   let t._exists_return_func_name = 'VMockTestFuncExistsReturn'
 
-  function! t.setup()
+  function! t.before_each()
     function! VMockTestFuncNoArgs()
       return 'ORIGIN'
     endfunction
@@ -58,7 +58,7 @@ function! g:make_test()
     endfunction
   endfunction
 
-  function! t.teardown()
+  function! t.after_each()
     delfunction VMockTestFuncNoArgs
     delfunction VMockTestFuncOneArgs
     delfunction VMockTestFuncTwoArgs

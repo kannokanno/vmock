@@ -1,85 +1,82 @@
-function! s:make_test(name) "{{{
-  let t = vimtest#new(a:name)
+let s:suite  = themis#suite('UAT - with and count ')
+let s:assert = themis#helper('assert')
 
-  function! t.setup()
-    call vmock#clear()
+function! s:suite.before_each()
+  call vmock#clear()
 
-    function! g:vmock_test_func_no_args()
-    endfunction
-    function! g:vmock_test_func_one_args(one)
-    endfunction
-    function! g:vmock_test_func_two_args(one, two)
-    endfunction
-    function! g:vmock_test_func_variable_args(...)
-    endfunction
+  function! VMockTestFunc_no_args()
   endfunction
-
-  function! t.teardown()
-    delfunction g:vmock_test_func_no_args
-    delfunction g:vmock_test_func_one_args
-    delfunction g:vmock_test_func_two_args
-    delfunction g:vmock_test_func_variable_args
+  function! VMockTestFunc_one_args(one)
   endfunction
-
-  function! t._assert_verify_is_success()
-    for mock in vmock#container#get_mocks()
-      let result = mock.verify()
-      if result.is_fail
-        call self.assert.fail(result.message)
-      endif
-    endfor
-    call self.assert.success()
+  function! VMockTestFunc_two_args(one, two)
   endfunction
-
-  function! t._assert_verify_is_fail(expected)
-    for mock in vmock#container#get_mocks()
-      let result = mock.verify()
-      if result.is_fail
-        call self.assert.equals(a:expected, result.message)
-        return
-      endif
-    endfor
-    call self.assert.fail('Expected failed but success')
+  function! VMockTestFunc_variable_args(...)
   endfunction
-
-  return t
 endfunction
-"}}}
-let s:t = s:make_test('UAT - with and count ') "{{{
 
-function! s:t.match_success_and_count_success()
-  call vmock#mock('g:vmock_test_func_two_args')
+function! s:suite.after_each()
+  delfunction VMockTestFunc_no_args
+  delfunction VMockTestFunc_one_args
+  delfunction VMockTestFunc_two_args
+  delfunction VMockTestFunc_variable_args
+endfunction
+
+" mock呼び出しが期待通りに呼ばれたことをassertするヘルパー
+function! s:_assert_verify_is_success()
+  for mock in vmock#container#get_mocks()
+    let result = mock.verify()
+    if result.is_fail
+      call s:assert.fail(result.message)
+    endif
+  endfor
+  call s:assert.true(1)
+endfunction
+
+" mock呼び出しが期待通りに呼ばれなかったことをassertするヘルパー
+function! s:_assert_verify_is_fail(expected)
+  for mock in vmock#container#get_mocks()
+    let result = mock.verify()
+    if result.is_fail
+      call s:assert.equals(a:expected, result.message)
+      return
+    endif
+  endfor
+  call s:assert.fail('Expected failed but success')
+endfunction
+
+function! s:suite.match_success_and_count_success()
+  call vmock#mock('VMockTestFunc_two_args')
         \.with(vmock#eq('hoge'), vmock#eq([1, 2])).return(100).times(3)
-  call self.assert.equals(100, g:vmock_test_func_two_args('hoge', [1, 2]))
-  call self.assert.equals(100, g:vmock_test_func_two_args('hoge', [1, 2]))
-  call self.assert.equals(100, g:vmock_test_func_two_args('hoge', [1, 2]))
-  call self._assert_verify_is_success()
+  call s:assert.equals(100, VMockTestFunc_two_args('hoge', [1, 2]))
+  call s:assert.equals(100, VMockTestFunc_two_args('hoge', [1, 2]))
+  call s:assert.equals(100, VMockTestFunc_two_args('hoge', [1, 2]))
+  call s:_assert_verify_is_success()
 endfunction
 
-function! s:t.match_success_and_count_fail()
-  call vmock#mock('g:vmock_test_func_two_args')
+function! s:suite.match_success_and_count_fail()
+  call vmock#mock('VMockTestFunc_two_args')
         \.with(vmock#eq('hoge'), vmock#eq([1, 2])).return(100).times(3)
-  call self.assert.equals(100, g:vmock_test_func_two_args('hoge', [1, 2]))
-  call self.assert.equals(100, g:vmock_test_func_two_args('hoge', [1, 2]))
-  call self._assert_verify_is_fail("expected: exactly 3 times. but received: 2 times.")
+  call s:assert.equals(100, VMockTestFunc_two_args('hoge', [1, 2]))
+  call s:assert.equals(100, VMockTestFunc_two_args('hoge', [1, 2]))
+  call s:_assert_verify_is_fail("expected: exactly 3 times. but received: 2 times.")
 endfunction
 
-function! s:t.match_fail_and_count_success()
-  call vmock#mock('g:vmock_test_func_two_args')
+function! s:suite.match_fail_and_count_success()
+  call vmock#mock('VMockTestFunc_two_args')
         \.with(vmock#eq('hoge'), vmock#eq([1, 2])).return(100).times(3)
-  call self.assert.equals(100, g:vmock_test_func_two_args('hoge', [1, 2]))
-  call self.assert.equals(100, g:vmock_test_func_two_args('hoge', [1, 2]))
-  call self.assert.equals(100, g:vmock_test_func_two_args('piyo', [1, 2]))
-  call self._assert_verify_is_fail("The args[0] expected: 'hoge'. but received: 'piyo'.")
+  call s:assert.equals(100, VMockTestFunc_two_args('hoge', [1, 2]))
+  call s:assert.equals(100, VMockTestFunc_two_args('hoge', [1, 2]))
+  call s:assert.equals(100, VMockTestFunc_two_args('piyo', [1, 2]))
+  call s:_assert_verify_is_fail("The args[0] expected: 'hoge'. but received: 'piyo'.")
 endfunction
 
-function! s:t.match_fail_and_count_fail()
-  call vmock#mock('g:vmock_test_func_two_args')
+function! s:suite.match_fail_and_count_fail()
+  call vmock#mock('VMockTestFunc_two_args')
         \.with(vmock#eq('hoge'), vmock#eq([1, 2])).return(100).times(3)
-  call self.assert.equals(100, g:vmock_test_func_two_args('hoge', [1, 2]))
-  call self.assert.equals(100, g:vmock_test_func_two_args('hoge', [1, 2]))
-  call self.assert.equals(100, g:vmock_test_func_two_args('piyo', [1, 2]))
-  call self.assert.equals(100, g:vmock_test_func_two_args('hoge', [1, 2]))
-  call self._assert_verify_is_fail("expected: exactly 3 times. but received: 4 times.")
+  call s:assert.equals(100, VMockTestFunc_two_args('hoge', [1, 2]))
+  call s:assert.equals(100, VMockTestFunc_two_args('hoge', [1, 2]))
+  call s:assert.equals(100, VMockTestFunc_two_args('piyo', [1, 2]))
+  call s:assert.equals(100, VMockTestFunc_two_args('hoge', [1, 2]))
+  call s:_assert_verify_is_fail("expected: exactly 3 times. but received: 4 times.")
 endfunction
-"}}}
+
